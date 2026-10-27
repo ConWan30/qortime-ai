@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "qortime-ai"
+version = "0.1.0"
+description = "QorTime AI layer: Meta Muse Spark explains and double-checks a deterministic match referee, never decides it (Meta AI Developer Hackathon, Oct 26 - Nov 4 2026)"
+license = { text = "MIT" }
+requires-python = ">=3.10"
+# Pre-existing QorTime receipt/referee library, pinned to the last pre-event commit; it is a dependency, not part of this repo.
+dependencies = ["qor-receipt @ git+https://github.com/ConWan30/qortime@0e87ec3be0f8268f41a46d6368861fbc45976dea", "cryptography>=42"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "fastapi>=0.110", "httpx>=0.27", "numpy>=1.26", "opencv-python-headless>=4.9"]
+
+[tool.setuptools.packages.find]
+include = ["qortime_ai*"]
+
+[tool.setuptools.package-data]
+"*" = ["*.json", "*.md"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
