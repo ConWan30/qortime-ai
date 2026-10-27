@@ -1,0 +1,441 @@
+{
+ "attacks": [
+  {
+   "id": "score_edit_unsigned",
+   "category": "edit",
+   "description": "Increase home score from 24 to 31 without re-signing.",
+   "expected_catch": "Referee and player signature verification over canonical receipt must fail.",
+   "ops": [
+    {
+     "op": "set",
+     "path": "result.home_score",
+     "value": 31
+    }
+   ],
+   "resign": "none",
+   "pin": "honest"
+  },
+  {
+   "id": "winner_flip_unsigned",
+   "category": "edit",
+   "description": "Flip winner to away despite home leading 24-17 without re-signing.",
+   "expected_catch": "Signature verification and winner-versus-score consistency check must fail.",
+   "ops": [
+    {
+     "op": "set",
+     "path": "result.winner",
+     "value": "away"
+    }
+   ],
+   "resign": "none",
+   "pin": "honest"
+  },
+  {
+   "id": "score_edit_attacker_sig_only",
+   "category": "forged_signature",
+   "description": "Edit score and replace only the referee signature with an attacker signature.",
+   "expected_catch": "Referee key_id and pinned referee pubkey mismatch must fail.",
+   "ops": [
+    {
+     "op": "set",
+     "path": "result.home_score",
+     "value": 31
+    },
+    {
+     "op": "set",
+     "path": "result.winner",
+     "value": "home"
+    }
+   ],
+   "resign": "attacker_sig_only",
+   "pin": "honest"
+  },
+  {
+   "id": "score_edit_attacker_identity",
+   "category": "forged_signature",
+   "description": "Edit score, replace referee identity, and re-sign as attacker referee.",
+   "expected_catch": "Pinned honest referee pubkey and key_id check must fail.",
+   "ops": [
+    {
+     "op": "set",
+     "path": "result.away_score",
+     "value": 3
+    }
+   ],
+   "resign": "attacker_identity",
+   "pin": "honest"
+  },
+  {
+   "id": "attacker_identity_pin_attacker",
+   "category": "pin_trick",
+   "description": "Re-sign a losing-score edit under attacker referee key and make verifier pin the attacker.",
+   "expected_catch": "Out-of-band referee pin provenance check must reject attacker-supplied pin.",
+   "ops": [
+    {
+     "op": "set",
+     "path": "result.home_score",
+     "value": 0
+    },
+    {
+     "op": "set",
+     "path": "result.winner",
+     "value": "away"
+    }
+   ],
+   "resign": "attacker_identity",
+   "pin": "attacker"
+  },
+  {
+   "id": "attacker_identity_pin_none",
+   "category": "pin_trick",
+   "description": "Re-sign edited receipt as attacker referee and rely on verifier pinning no referee key.",
+   "expected_catch": "Verifier must require a pinned referee key and reject unpinned trust.",
+   "ops": [
+    {
+     "op": "set",
+     "path": "result.home_score",
+     "value": 99
+    }
+   ],
+   "resign": "attacker_identity",
+   "pin": "none"
+  },
+  {
+   "id": "attacker_identity_and_players_forgery",
+   "category": "forged_signature",
+   "description": "Rewrite score and re-sign as attacker referee and both attacker players.",
+   "expected_catch": "Pinned referee identity and original player pubkey binding must fail.",
+   "ops": [
+    {
+     "op": "set",
+     "path": "result.home_score",
+     "value": 42
+    },
+    {
+     "op": "set",
+     "path": "result.away_score",
+     "value": 0
+    },
+    {
+     "op": "set",
+     "path": "result.winner",
+     "value": "home"
+    }
+   ],
+   "resign": "attacker_identity_and_players",
+   "pin": "honest"
+  },
+  {
+   "id": "full_donor_replay",
+   "category": "replay",
+   "description": "Replace the whole receipt with a donor receipt from another match by the same referee.",
+   "expected_catch": "Expected match_id, player, and freshness binding for this match must fail.",
+   "ops": [
+    {
+     "op": "replace_with_donor"
+    }
+   ],
+   "resign": "none",
+   "pin": "honest"
+  },
+  {
+   "id": "match_id_swap_donor",
+   "category": "splice",
+   "description": "Copy only the donor match_id into this receipt to reroute the result.",
+   "expected_catch": "Signature verification and checkpoint/challenge match binding must fail.",
+   "ops": [
+    {
+     "op": "copy_from_donor",
+     "path": "match.match_id"
+    }
+   ],
+   "resign": "none",
+   "pin": "honest"
+  },
+  {
+   "id": "result_splice_donor",
+   "category": "splice",
+   "description": "Copy the donor result block into this receipt while keeping this match metadata.",
+   "expected_catch": "Signature verification and cross-field timeline/score consistency must fail.",
+   "ops": [
+    {
+     "op": "copy_from_donor",
+     "path": "result"
+    }
+   ],
+   "resign": "none",
+   "pin": "honest"
+  },
+  {
+   "id": "checkpoint_splice_donor",
+   "category": "splice",
+   "description": "Copy donor home checkpoints into this receipt to fabricate frame history.",
+   "expected_catch": "Checkpoint referee signatures, hash chain, and match timeline binding must fail.",
+   "ops": [
+    {
+     "op": "copy_from_donor",
+     "path": "checkpoints.home"
+    }
+   ],
+   "resign": "none",
+   "pin": "honest"
+  },
+  {
+   "id": "challenge_splice_donor",
+   "category": "splice",
+   "description": "Copy donor challenges into this receipt to reuse passed human-presence evidence.",
+   "expected_catch": "Challenge nonce binding to match, players, and timestamps plus signatures must fail.",
+   "ops": [
+    {
+     "op": "copy_from_donor",
+     "path": "challenges"
+    }
+   ],
+   "resign": "none",
+   "pin": "honest"
+  },
+  {
+   "id": "drop_failed_challenge",
+   "category": "deletion",
+   "description": "Delete the first challenge entry to hide its evidence from review.",
+   "expected_catch": "Required challenge count per role and phase completeness check must fail.",
+   "ops": [
+    {
+     "op": "delete",
+     "path": "challenges.0"
+    }
+   ],
+   "resign": "none",
+   "pin": "honest"
+  },
+  {
+   "id": "reorder_challenges",
+   "category": "reorder",
+   "description": "Reverse the challenges list to confuse role and phase ordering.",
+   "expected_catch": "Signature verification over ordered list and challenge sequence checks must fail.",
+   "ops": [
+    {
+     "op": "reverse",
+     "path": "challenges"
+    }
+   ],
+   "resign": "none",
+   "pin": "honest"
+  },
+  {
+   "id": "drop_first_checkpoint",
+   "category": "deletion",
+   "description": "Delete the first home checkpoint to remove early frame evidence.",
+   "expected_catch": "Checkpoint sequence starting at 0 and genesis prev-hash chain check must fail.",
+   "ops": [
+    {
+     "op": "delete",
+     "path": "checkpoints.home.0"
+    }
+   ],
+   "resign": "none",
+   "pin": "honest"
+  },
+  {
+   "id": "reorder_checkpoints",
+   "category": "reorder",
+   "description": "Move the first home checkpoint to second position to break sequencing.",
+   "expected_catch": "Checkpoint seq monotonicity, prev-hash chain, and referee_sig checks must fail.",
+   "ops": [
+    {
+     "op": "move",
+     "path": "checkpoints.home.0",
+     "to": 1
+    }
+   ],
+   "resign": "none",
+   "pin": "honest"
+  },
+  {
+   "id": "checkpoint_hash_edit",
+   "category": "checkpoint_chain",
+   "description": "Zero out a home checkpoint hash while leaving the rest of the chain intact.",
+   "expected_catch": "Recomputed checkpoint hash and next checkpoint prev linkage must fail.",
+   "ops": [
+    {
+     "op": "set",
+     "path": "checkpoints.home.0.hash",
+     "value": "0000000000000000000000000000000000000000000000000000000000000000"
+    }
+   ],
+   "resign": "none",
+   "pin": "honest"
+  },
+  {
+   "id": "checkpoint_prev_break",
+   "category": "checkpoint_chain",
+   "description": "Rewrite the second home checkpoint prev pointer to hide a missing frame segment.",
+   "expected_catch": "Hash-chain prev equals prior hash verification must fail.",
+   "ops": [
+    {
+     "op": "set",
+     "path": "checkpoints.home.1.prev",
+     "value": "0000000000000000000000000000000000000000000000000000000000000000"
+    }
+   ],
+   "resign": "none",
+   "pin": "honest"
+  },
+  {
+   "id": "timestamp_shift_start",
+   "category": "timestamp_splice",
+   "description": "Shift match start one hour earlier to make stale evidence appear timely.",
+   "expected_catch": "Signature verification and challenge/checkpoint timestamps within match window must fail.",
+   "ops": [
+    {
+     "op": "shift_int",
+     "path": "match.started_ms",
+     "by": -3600000
+    }
+   ],
+   "resign": "none",
+   "pin": "honest"
+  },
+  {
+   "id": "final_time_after_end",
+   "category": "timestamp_splice",
+   "description": "Shift result final time beyond match ended time.",
+   "expected_catch": "final_t_ms <= ended_ms and final-basis clock consistency check must fail.",
+   "ops": [
+    {
+     "op": "shift_int",
+     "path": "result.final_t_ms",
+     "by": 600000
+    }
+   ],
+   "resign": "none",
+   "pin": "honest"
+  },
+  {
+   "id": "challenge_latency_edit",
+   "category": "challenge_evidence",
+   "description": "Set a challenge latency to zero and keep ok true to launder superhuman input timing.",
+   "expected_catch": "Signature verification and latency equals done minus pause timing recomputation must fail.",
+   "ops": [
+    {
+     "op": "set",
+     "path": "challenges.0.result.latency_ms",
+     "value": 0
+    },
+    {
+     "op": "set",
+     "path": "challenges.0.result.hid_sha256",
+     "value": "0000000000000000000000000000000000000000000000000000000000000000"
+    }
+   ],
+   "resign": "none",
+   "pin": "honest"
+  },
+  {
+   "id": "trust_tier_upgrade",
+   "category": "trust_downgrade_upgrade",
+   "description": "Upgrade trust_tier to a fabricated hardware tier without changing any keys.",
+   "expected_catch": "Trust tier must be derived from key_kind and attestation evidence, not the signed claim alone, and signature must fail.",
+   "ops": [
+    {
+     "op": "set",
+     "path": "trust_tier",
+     "value": "hardware-attested"
+    }
+   ],
+   "resign": "none",
+   "pin": "honest"
+  },
+  {
+   "id": "referee_key_kind_upgrade",
+   "category": "trust_downgrade_upgrade",
+   "description": "Change referee key_kind from software to hardware to claim stronger custody.",
+   "expected_catch": "Key attestation for key_kind and signature verification must fail.",
+   "ops": [
+    {
+     "op": "set",
+     "path": "referee.key_kind",
+     "value": "hardware"
+    }
+   ],
+   "resign": "none",
+   "pin": "honest"
+  },
+  {
+   "id": "signal_laundering_delete",
+   "category": "signal_laundering",
+   "description": "Delete motion signals and set timelines_agree true to hide automation or desync evidence.",
+   "expected_catch": "Required signals presence and agreement-versus-checkpoint mismatch derivation must fail.",
+   "ops": [
+    {
+     "op": "delete",
+     "path": "signals.motion_permille"
+    },
+    {
+     "op": "set",
+     "path": "agreement.timelines_agree",
+     "value": true
+    },
+    {
+     "op": "set",
+     "path": "agreement.mismatches",
+     "value": []
+    }
+   ],
+   "resign": "none",
+   "pin": "honest"
+  },
+  {
+   "id": "score_type_confusion",
+   "category": "type_confusion",
+   "description": "Change home_score to the string 24 to exploit loose numeric parsing.",
+   "expected_catch": "Strict schema type validation requiring integer scores must fail.",
+   "ops": [
+    {
+     "op": "set",
+     "path": "result.home_score",
+     "value": "24"
+    },
+    {
+     "op": "set",
+     "path": "result.winner",
+     "value": null
+    }
+   ],
+   "resign": "none",
+   "pin": "honest"
+  },
+  {
+   "id": "duplicate_role_and_pubkey_swap",
+   "category": "duplicate_role",
+   "description": "Make both players role home and swap their pubkeys to take over the winning identity.",
+   "expected_catch": "Unique home/away role check and player_id to pubkey to signature binding must fail.",
+   "ops": [
+    {
+     "op": "set",
+     "path": "players.1.role",
+     "value": "home"
+    },
+    {
+     "op": "swap",
+     "path": "players.0.pubkey",
+     "with": "players.1.pubkey"
+    }
+   ],
+   "resign": "none",
+   "pin": "honest"
+  }
+ ],
+ "generator": {
+  "model": "muse-wonder-1.0",
+  "reasoning_effort": "low",
+  "usage": {
+   "prompt_tokens": 2443,
+   "completion_tokens": 3342,
+   "reasoning_tokens": 703
+  },
+  "usd_est": 0.076612,
+  "generated": "2026-10-27",
+  "note": "cached model output; tests and the CLI replay it offline"
+ }
+}

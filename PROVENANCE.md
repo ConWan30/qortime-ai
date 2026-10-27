@@ -30,6 +30,7 @@ upstream checkout; the panel CSS added to `verify/viewer.css` in #92/#93/#95 was
 | `examples/170123/ai_ruling.json`, `score_crosscheck.json`, `hands.json` | `site/matches/170123/` | #92, #93, #95 |
 | `examples/170123/ai_ruling_170123_*.example.json` | `docs/hackathon/` | #90 |
 | `demo_pipeline/captions/*` | submission demo pipeline (never in qortime) | Oct 26–27 |
+| `qortime_ai/redteam/*`, `tests/test_redteam.py`, `examples/redteam/*` | new in this repo (never in qortime); built Oct 27 2026, in the event window. The verifier it attacks is pre-existing and unmodified | Oct 27– |
 
 ## Event-built edits to pre-existing qortime files (stay upstream, not copied here)
 Small hooks that wire the code above into the existing referee and verifier page:

@@ -1,0 +1,87 @@
+{
+ "schema": "qortime-redteam-explanations/v1",
+ "cases": {
+  "honest": {
+   "facts": {
+    "verdict": "VERIFIED",
+    "errors": [],
+    "partial": [],
+    "referee_trust": "active",
+    "trust_tier": "dual-attested",
+    "match.game": "madden27",
+    "match.platform": "ps5",
+    "match.mode": "dual",
+    "players.count": 2,
+    "challenges.count": 6,
+    "challenges.passed": 6,
+    "signatures.referee": "present",
+    "signatures.players": [
+     "away",
+     "home"
+    ],
+    "agreement.timelines_agree": true,
+    "result.home_score": 24,
+    "result.away_score": 17,
+    "result.winner": "home",
+    "result.quarter": 4,
+    "result.method": "agreed_scorebug_final",
+    "result.final_basis": "clock_zero",
+    "checkpoints.away.count": 94,
+    "checkpoints.home.count": 94,
+    "signals.motion_permille.away": 1000,
+    "signals.motion_permille.home": 1000
+   },
+   "text": "The referee returned VERIFIED [verdict].\nHome won 24 to 17 in quarter 4 [result.winner] [result.home_score] [result.away_score] [result.quarter].\nAll 6 challenges passed with 94 checkpoints from away and 94 from home [challenges.count] [challenges.passed] [checkpoints.away.count] [checkpoints.home.count] [signatures.players].\nThis does not prove who held the controller [players.count] [signatures.players].",
+   "model": "muse-spark-1.3",
+   "usage": {
+    "prompt_tokens": 381,
+    "completion_tokens": 2461,
+    "reasoning_tokens": 2349
+   },
+   "usd_est": 0.010935
+  },
+  "score_edit_unsigned": {
+   "facts": {
+    "verdict": "FAIL",
+    "errors": [
+     "bad_referee_signature",
+     "bad_player_signature:away",
+     "bad_player_signature:home"
+    ],
+    "partial": [],
+    "referee_trust": "active",
+    "trust_tier": "dual-attested",
+    "match.game": "madden27",
+    "match.platform": "ps5",
+    "match.mode": "dual",
+    "players.count": 2,
+    "challenges.count": 6,
+    "challenges.passed": 6,
+    "signatures.referee": "present",
+    "signatures.players": [
+     "away",
+     "home"
+    ],
+    "agreement.timelines_agree": true,
+    "result.home_score": 31,
+    "result.away_score": 17,
+    "result.winner": "home",
+    "result.quarter": 4,
+    "result.method": "agreed_scorebug_final",
+    "result.final_basis": "clock_zero",
+    "checkpoints.away.count": 94,
+    "checkpoints.home.count": 94,
+    "signals.motion_permille.away": 1000,
+    "signals.motion_permille.home": 1000
+   },
+   "text": "The referee returned FAIL [verdict].\nThe listed problems were bad_referee_signature and bad_player_signature:away and bad_player_signature:home [errors].\nThe reported score was 31 for home and 17 for away with winner home in quarter 4 [result.home_score] [result.away_score] [result.winner] [result.quarter].\nThis result does not prove who held the controller [players.count] [trust_tier].",
+   "model": "muse-spark-1.3",
+   "usage": {
+    "prompt_tokens": 403,
+    "completion_tokens": 1870,
+    "reasoning_tokens": 1771
+   },
+   "usd_est": 0.008451
+  }
+ }
+}
