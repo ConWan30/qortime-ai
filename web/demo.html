@@ -16,6 +16,7 @@
  <div class="panels" id="xcSlot"></div>
  <div class="panels" id="handsSlot"></div>
  <div class="panels" id="aiSlot"></div>
+ <div class="panels" id="seenSlot"></div>
 </main>
 <script type="module">
 import { verifyReceipt } from "../upstream/qortime/verify/verify.js";
@@ -24,6 +25,7 @@ import { checkAiRuling, aiRulingPanel } from "./ai-ruling-view.js";
 import { checkCrosscheck, applyCrosscheck, crosscheckPanel } from "./score-crosscheck-view.js";
 import { checkHands, applyHands, handsPanel } from "./hands-view.js";
 import { acceptLowerOnly } from "./lower-only.js";
+import { checkSeen, seenPanel } from "./seen-view.js";
 const $ = (id) => document.getElementById(id);
 const base = "../examples/170123/";
 $("src").textContent = base + "receipt.json";
@@ -45,6 +47,9 @@ async function check() {
   const hp = handsPanel(hands); $("handsSlot").replaceChildren(...(hp ? [hp] : []));
   const ai = await checkAiRuling(await getJson(base + "ai_ruling.json"), receiptDoc, v0.status);
   $("aiSlot").replaceChildren(...(ai.ok ? [aiRulingPanel(ai)] : []));
+  // Visualization only (SAM 3.1 Evidence Lens): shown after the result, never changes it. Gold only if verify.js said VERIFIED.
+  const seen = await checkSeen(await getJson(base + "seen.json"), receiptDoc);
+  $("seenSlot").replaceChildren(seenPanel(seen, { verifierStatus: v0.status, stillUrl: base + "seen/hl01-frame-t8.7.jpg", stillClip: "hl01-q4-a9-h0", stillT: 8.7 }));
 }
 $("go").addEventListener("click", check);
 check();

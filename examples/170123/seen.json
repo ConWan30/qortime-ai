@@ -1,0 +1,675 @@
+{
+ "schema": "seen.v0",
+ "label": "visualization / info only — not a referee input",
+ "affects_verdict": false,
+ "emits_status": false,
+ "built_during": "Meta AI Developer Hackathon, Oct 26 - Nov 4 2026 (built Oct 27 2026)",
+ "match_id": "local-20261023-170123",
+ "receipt_jcs_sha256": "a74ec73d41a66aad00f21e6922d7d2cebba2d887fede49b77a6097ee768b4bef",
+ "receipt_file_sha256": "69480a406d1621409cf03dc98eadcb9020c384a368d9fb0fcab63b61c9f12bb0",
+ "models": {
+  "tracking": "sam-3.1",
+  "captions": "muse-spark-1.3",
+  "mask_decoding": "meta-sam-parser 0.1.0"
+ },
+ "prompts": [
+  {
+   "type": "box",
+   "target": "scorebug",
+   "box_640x360": [
+    8,
+    340,
+    485,
+    359
+   ],
+   "source": "the referee's madden27_standard scorebug OCR region",
+   "propagation": "forward",
+   "objects": 1
+  },
+  {
+   "type": "concept",
+   "text": "football player",
+   "use": "motion attribution only (aggregate %)"
+  }
+ ],
+ "segment_basis": "Chain segments covered by QorCap's public highlight clips of this match, bound by segment seq + segment sha256 (qorcap-highlights manifest) and the receipt checkpoint each clip's score lock is in. receipt.v0 does not publish which segments the motion rule's random draw sampled, so these are NOT claimed to be the referee's motion sample.",
+ "energy_basis": "Frame-difference energy as in the referee's motion_series (mean |gray_t - gray_t-1|), recomputed at 640x360 on the public clip, split by SAM 3.1 masks: players = 'football player' masks, hud = the box-prompted scorebug mask, rest = everything else (field, crowd, camera). QorCap's burned-in label is excluded. motion_permille in the receipt is a controller-vs-video correlation; this explains only its video side and does not recompute it.",
+ "lens_basis": "Evidence Lens windows come from the receipt timeline (score-lock checkpoint, challenge windows) and the lock's receipt-bound segment; positions come from SAM tracks. Gold only for a score lock when the pre-existing verifier returns VERIFIED; never decided by AI.",
+ "not_published": "per-frame masks, per-frame boxes, anything per player",
+ "clips": [
+  {
+   "id": "hl00-q3-a3-h0",
+   "clip_sha256": "46e732640b65a1cdbf8e4f593713cfecea9abb1e6910dad55f070045d19ec70b",
+   "frames": 359,
+   "fps": 30,
+   "lock": {
+    "checkpoint": "checkpoints.away[306]",
+    "hash": "255d214be88e3e98906ecf2ccb37530268a8d8a5fc91ec37183e62947f1d80b3",
+    "segment_seq": 298,
+    "t_s": 8.0
+   },
+   "sam_frames_processed": {
+    "scorebug": 359,
+    "players": 359
+   },
+   "scorebug": {
+    "frames": 359,
+    "in_place": 359,
+    "off_roi": 0,
+    "dropouts": 0,
+    "max_anchor_jump_px": 1,
+    "roi_in_mask_min_permille": 860,
+    "first_not_in_place_s": null
+   },
+   "motion_pct": {
+    "players": 6,
+    "hud": 0,
+    "rest": 94
+   },
+   "player_objects_tracked": 16,
+   "segments": [
+    {
+     "seq": 294,
+     "segment_sha256": "8aa9148322ec8e10e27c6df7da98a5532cb4a5ab7f9c73a3702e18856262e9d0",
+     "t0": 0.0,
+     "t1": 1.726,
+     "scorebug": {
+      "frames": 52,
+      "in_place": 52,
+      "off_roi": 0,
+      "dropouts": 0,
+      "max_anchor_jump_px": 0,
+      "roi_in_mask_min_permille": 860,
+      "first_not_in_place_s": null
+     },
+     "motion_pct": {
+      "players": 14,
+      "hud": 0,
+      "rest": 86
+     },
+     "caption": "Motion was players 14%, HUD 0%, rest 86%[seen.motion.players_pct,seen.motion.hud_pct,seen.motion.rest_pct]. Scorebug stayed in place for 52 of 52 frames[seen.scorebug.frames,seen.scorebug.in_place].",
+     "caption_source": "muse-spark-1.3"
+    },
+    {
+     "seq": 295,
+     "segment_sha256": "f0bbc83381284a1c46bef49fc20172a3f68f9f20b25c912bcdd43fced3417615",
+     "t0": 1.711,
+     "t1": 3.711,
+     "scorebug": {
+      "frames": 60,
+      "in_place": 60,
+      "off_roi": 0,
+      "dropouts": 0,
+      "max_anchor_jump_px": 1,
+      "roi_in_mask_min_permille": 860,
+      "first_not_in_place_s": null
+     },
+     "motion_pct": {
+      "players": 3,
+      "hud": 0,
+      "rest": 97
+     },
+     "caption": "Motion was players 3%, HUD 0%, rest 97%[seen.motion.players_pct,seen.motion.hud_pct,seen.motion.rest_pct]. Scorebug stayed in place for 60 of 60 frames[seen.scorebug.frames,seen.scorebug.in_place].",
+     "caption_source": "muse-spark-1.3"
+    },
+    {
+     "seq": 296,
+     "segment_sha256": "767f300e3c35c185ad0e2c10594347714e7b82641b0b3af60d98b760ba2ea757",
+     "t0": 3.721,
+     "t1": 5.721,
+     "scorebug": {
+      "frames": 60,
+      "in_place": 60,
+      "off_roi": 0,
+      "dropouts": 0,
+      "max_anchor_jump_px": 1,
+      "roi_in_mask_min_permille": 860,
+      "first_not_in_place_s": null
+     },
+     "motion_pct": {
+      "players": 0,
+      "hud": 1,
+      "rest": 99
+     },
+     "caption": "Motion was players 0%, HUD 1%, rest 99%[seen.motion.players_pct,seen.motion.hud_pct,seen.motion.rest_pct]. Scorebug stayed in place for 60 of 60 frames[seen.scorebug.frames,seen.scorebug.in_place].",
+     "caption_source": "muse-spark-1.3"
+    },
+    {
+     "seq": 297,
+     "segment_sha256": "352f49cedcef8d57db67505b79ec554d62a2af3844c55b807caf39aa13d4b933",
+     "t0": 5.716,
+     "t1": 7.716,
+     "scorebug": {
+      "frames": 60,
+      "in_place": 60,
+      "off_roi": 0,
+      "dropouts": 0,
+      "max_anchor_jump_px": 0,
+      "roi_in_mask_min_permille": 889,
+      "first_not_in_place_s": null
+     },
+     "motion_pct": {
+      "players": 5,
+      "hud": 1,
+      "rest": 94
+     },
+     "caption": "Motion was players 5%, HUD 1%, rest 94%[seen.motion.players_pct,seen.motion.hud_pct,seen.motion.rest_pct]. Scorebug stayed in place for 60 of 60 frames[seen.scorebug.frames,seen.scorebug.in_place].",
+     "caption_source": "muse-spark-1.3"
+    },
+    {
+     "seq": 298,
+     "segment_sha256": "ac46b5e4d4ae59842b49aada638173656ba4a42cb68321f11c8bbe475204923e",
+     "t0": 7.726,
+     "t1": 9.726,
+     "scorebug": {
+      "frames": 60,
+      "in_place": 60,
+      "off_roi": 0,
+      "dropouts": 0,
+      "max_anchor_jump_px": 1,
+      "roi_in_mask_min_permille": 860,
+      "first_not_in_place_s": null
+     },
+     "motion_pct": {
+      "players": 21,
+      "hud": 0,
+      "rest": 79
+     },
+     "caption": "Motion was players 21%, HUD 0%, rest 79%[seen.motion.players_pct,seen.motion.hud_pct,seen.motion.rest_pct]. Scorebug stayed in place for 60 of 60 frames[seen.scorebug.frames,seen.scorebug.in_place].",
+     "caption_source": "muse-spark-1.3"
+    },
+    {
+     "seq": 299,
+     "segment_sha256": "99b7bbd9b0af8c5d00d64b27fb268f5b8bb16f931f7982ddf4b6bd0ba4aeabfa",
+     "t0": 9.709,
+     "t1": 11.709,
+     "scorebug": {
+      "frames": 60,
+      "in_place": 60,
+      "off_roi": 0,
+      "dropouts": 0,
+      "max_anchor_jump_px": 0,
+      "roi_in_mask_min_permille": 860,
+      "first_not_in_place_s": null
+     },
+     "motion_pct": {
+      "players": 7,
+      "hud": 0,
+      "rest": 93
+     },
+     "caption": "Motion was players 7%, HUD 0%, rest 93%[seen.motion.players_pct,seen.motion.hud_pct,seen.motion.rest_pct]. Scorebug stayed in place for 60 of 60 frames[seen.scorebug.frames,seen.scorebug.in_place].",
+     "caption_source": "muse-spark-1.3"
+    }
+   ],
+   "lens_events": [
+    {
+     "kind": "motion_segment",
+     "t0": 7.726,
+     "t1": 9.726,
+     "track": "players",
+     "seq": 298,
+     "cite": "signals.motion_permille.away",
+     "box_ref": [
+      214,
+      68,
+      337,
+      337
+     ]
+    },
+    {
+     "kind": "score_lock",
+     "t0": 8.0,
+     "t1": 10.5,
+     "track": "scorebug",
+     "score": {
+      "away": 3,
+      "home": 0
+     },
+     "cite": "checkpoints.away[306]",
+     "box_ref": [
+      0,
+      338,
+      419,
+      360
+     ]
+    }
+   ],
+   "overlay": {
+    "file": "hl00-q3-a3-h0.seen.mp4",
+    "sha256": "b16fc00191e7cf4c6879bbc26c90b52f29a55237a079c648a960d11c1a4ec36c",
+    "bytes": 2606610
+   }
+  },
+  {
+   "id": "hl01-q4-a9-h0",
+   "clip_sha256": "7355a9fb5c058aa8a546cef920c034706dd42f541eb11bb67b7e8da7d18a8680",
+   "frames": 360,
+   "fps": 30,
+   "lock": {
+    "checkpoint": "checkpoints.away[459]",
+    "hash": "b89d944536b6293156ee6fa87e4c34f93ab531bd7be62e3cf016c5d99a6c7a7f",
+    "segment_seq": 448,
+    "t_s": 8.0
+   },
+   "sam_frames_processed": {
+    "scorebug": 360,
+    "players": 360
+   },
+   "scorebug": {
+    "frames": 360,
+    "in_place": 360,
+    "off_roi": 0,
+    "dropouts": 0,
+    "max_anchor_jump_px": 2,
+    "roi_in_mask_min_permille": 858,
+    "first_not_in_place_s": null
+   },
+   "motion_pct": {
+    "players": 11,
+    "hud": 0,
+    "rest": 89
+   },
+   "player_objects_tracked": 16,
+   "segments": [
+    {
+     "seq": 444,
+     "segment_sha256": "da62c0a25a00c4c5b2118d6884256cc1daae22fcaec830d60fcfa98b29ebe0e5",
+     "t0": 0.0,
+     "t1": 1.061,
+     "scorebug": {
+      "frames": 32,
+      "in_place": 32,
+      "off_roi": 0,
+      "dropouts": 0,
+      "max_anchor_jump_px": 1,
+      "roi_in_mask_min_permille": 862,
+      "first_not_in_place_s": null
+     },
+     "motion_pct": {
+      "players": 11,
+      "hud": 0,
+      "rest": 89
+     },
+     "caption": "Motion players 11%, HUD 0%, rest 89% [seen.motion.players_pct, seen.motion.hud_pct, seen.motion.rest_pct]. Scorebug in place 32 of 32 frames [seen.scorebug.in_place, seen.scorebug.frames]",
+     "caption_source": "muse-spark-1.3"
+    },
+    {
+     "seq": 445,
+     "segment_sha256": "478e9c1e994d93e48a813f6b77971b67df05b1c8517a87d446b175833030f662",
+     "t0": 1.057,
+     "t1": 3.057,
+     "scorebug": {
+      "frames": 60,
+      "in_place": 60,
+      "off_roi": 0,
+      "dropouts": 0,
+      "max_anchor_jump_px": 0,
+      "roi_in_mask_min_permille": 862,
+      "first_not_in_place_s": null
+     },
+     "motion_pct": {
+      "players": 9,
+      "hud": 0,
+      "rest": 91
+     },
+     "caption": "Motion players 9%, HUD 0%, rest 91% [seen.motion.players_pct, seen.motion.hud_pct, seen.motion.rest_pct]. Scorebug in place 60 of 60 frames [seen.scorebug.in_place, seen.scorebug.frames]",
+     "caption_source": "muse-spark-1.3"
+    },
+    {
+     "seq": 446,
+     "segment_sha256": "5cf1bad241c55ab0dabc60603a42e1c9c7d8e643848f798e1b38ce3a669deaed",
+     "t0": 3.063,
+     "t1": 5.063,
+     "scorebug": {
+      "frames": 60,
+      "in_place": 60,
+      "off_roi": 0,
+      "dropouts": 0,
+      "max_anchor_jump_px": 1,
+      "roi_in_mask_min_permille": 861,
+      "first_not_in_place_s": null
+     },
+     "motion_pct": {
+      "players": 9,
+      "hud": 0,
+      "rest": 91
+     },
+     "caption": "Motion players 9%, HUD 0%, rest 91% [seen.motion.players_pct, seen.motion.hud_pct, seen.motion.rest_pct]. Scorebug in place 60 of 60 frames [seen.scorebug.in_place, seen.scorebug.frames]",
+     "caption_source": "muse-spark-1.3"
+    },
+    {
+     "seq": 447,
+     "segment_sha256": "59c112bafe34b9602ed398c25e2216b1a5f0a86a81eee8ed4e6987b971f93447",
+     "t0": 5.048,
+     "t1": 7.048,
+     "scorebug": {
+      "frames": 60,
+      "in_place": 60,
+      "off_roi": 0,
+      "dropouts": 0,
+      "max_anchor_jump_px": 2,
+      "roi_in_mask_min_permille": 858,
+      "first_not_in_place_s": null
+     },
+     "motion_pct": {
+      "players": 14,
+      "hud": 0,
+      "rest": 86
+     },
+     "caption": "Motion players 14%, HUD 0%, rest 86% [seen.motion.players_pct, seen.motion.hud_pct, seen.motion.rest_pct]. Scorebug in place 60 of 60 frames [seen.scorebug.in_place, seen.scorebug.frames]",
+     "caption_source": "muse-spark-1.3"
+    },
+    {
+     "seq": 448,
+     "segment_sha256": "f3677ece68fda51aefda8ff5c7b1bfdf086878e2cc0fd2e2e4048540b09c0988",
+     "t0": 7.057,
+     "t1": 9.057,
+     "scorebug": {
+      "frames": 60,
+      "in_place": 60,
+      "off_roi": 0,
+      "dropouts": 0,
+      "max_anchor_jump_px": 0,
+      "roi_in_mask_min_permille": 861,
+      "first_not_in_place_s": null
+     },
+     "motion_pct": {
+      "players": 9,
+      "hud": 1,
+      "rest": 90
+     },
+     "caption": "Motion players 9%, HUD 1%, rest 90% [seen.motion.players_pct, seen.motion.hud_pct, seen.motion.rest_pct]. Scorebug in place 60 of 60 frames [seen.scorebug.in_place, seen.scorebug.frames]",
+     "caption_source": "muse-spark-1.3"
+    },
+    {
+     "seq": 449,
+     "segment_sha256": "a858600fd2ca0b1fd1e9155c6c19e78708e65036f0a7d9a44631c83c5b9a9703",
+     "t0": 9.048,
+     "t1": 11.048,
+     "scorebug": {
+      "frames": 60,
+      "in_place": 60,
+      "off_roi": 0,
+      "dropouts": 0,
+      "max_anchor_jump_px": 0,
+      "roi_in_mask_min_permille": 936,
+      "first_not_in_place_s": null
+     },
+     "motion_pct": {
+      "players": 13,
+      "hud": 0,
+      "rest": 87
+     },
+     "caption": "Motion players 13%, HUD 0%, rest 87% [seen.motion.players_pct, seen.motion.hud_pct, seen.motion.rest_pct]. Scorebug in place 60 of 60 frames [seen.scorebug.in_place, seen.scorebug.frames]",
+     "caption_source": "muse-spark-1.3"
+    },
+    {
+     "seq": 450,
+     "segment_sha256": "66e3d7492eb5cc78050e9261d0bbbc62c83a2f93a52617d6d1c0c94ef0883768",
+     "t0": 11.055,
+     "t1": 12.0,
+     "scorebug": {
+      "frames": 28,
+      "in_place": 28,
+      "off_roi": 0,
+      "dropouts": 0,
+      "max_anchor_jump_px": 1,
+      "roi_in_mask_min_permille": 861,
+      "first_not_in_place_s": null
+     },
+     "motion_pct": {
+      "players": 15,
+      "hud": 0,
+      "rest": 85
+     },
+     "caption": "Motion players 15%, HUD 0%, rest 85% [seen.motion.players_pct, seen.motion.hud_pct, seen.motion.rest_pct]. Scorebug in place 28 of 28 frames [seen.scorebug.in_place, seen.scorebug.frames]",
+     "caption_source": "muse-spark-1.3"
+    }
+   ],
+   "lens_events": [
+    {
+     "kind": "motion_segment",
+     "t0": 7.057,
+     "t1": 9.057,
+     "track": "players",
+     "seq": 448,
+     "cite": "signals.motion_permille.away",
+     "box_ref": [
+      35,
+      122,
+      640,
+      337
+     ]
+    },
+    {
+     "kind": "score_lock",
+     "t0": 8.0,
+     "t1": 10.5,
+     "track": "scorebug",
+     "score": {
+      "away": 9,
+      "home": 0
+     },
+     "cite": "checkpoints.away[459]",
+     "box_ref": [
+      0,
+      338,
+      484,
+      360
+     ]
+    }
+   ],
+   "overlay": {
+    "file": "hl01-q4-a9-h0.seen.mp4",
+    "sha256": "13a954c228f6bc582fcd6b89f0b9b3a3eccf415031bd7dfae76a45d3436a035f",
+    "bytes": 3281798
+   }
+  },
+  {
+   "id": "hl02-q4-a10-h0",
+   "clip_sha256": "576e2b95c77d81c5715afa8e80761c4d4aa0486d3705cdf1f5eed2a149a9d14b",
+   "frames": 360,
+   "fps": 30,
+   "lock": {
+    "checkpoint": "checkpoints.away[467]",
+    "hash": "b72fa5714901f58bd2ecd74c073487b4811072e288e4cb34d5c90d506fe0889b",
+    "segment_seq": 455,
+    "t_s": 8.0
+   },
+   "sam_frames_processed": {
+    "scorebug": 360,
+    "players": 360
+   },
+   "scorebug": {
+    "frames": 360,
+    "in_place": 249,
+    "off_roi": 73,
+    "dropouts": 38,
+    "max_anchor_jump_px": 1,
+    "roi_in_mask_min_permille": 857,
+    "first_not_in_place_s": 8.3
+   },
+   "motion_pct": {
+    "players": 12,
+    "hud": 5,
+    "rest": 83
+   },
+   "player_objects_tracked": 16,
+   "segments": [
+    {
+     "seq": 452,
+     "segment_sha256": "4012e5729a2d7260507f574876c841d8740b42475820e13625cc770cad362a53",
+     "t0": 0.192,
+     "t1": 2.192,
+     "scorebug": {
+      "frames": 60,
+      "in_place": 60,
+      "off_roi": 0,
+      "dropouts": 0,
+      "max_anchor_jump_px": 0,
+      "roi_in_mask_min_permille": 974,
+      "first_not_in_place_s": null
+     },
+     "motion_pct": {
+      "players": 3,
+      "hud": 0,
+      "rest": 97
+     },
+     "caption": "Motion was players 3% [seen.motion.players_pct], HUD 0% [seen.motion.hud_pct], rest 97% [seen.motion.rest_pct]. Scorebug stayed in place [seen.scorebug.in_place, seen.scorebug.frames].",
+     "caption_source": "muse-spark-1.3"
+    },
+    {
+     "seq": 453,
+     "segment_sha256": "9cd5af45e5046041d76c86bd3705c46ddef2b512d94fee0e1d29f0e220e7877b",
+     "t0": 2.183,
+     "t1": 4.183,
+     "scorebug": {
+      "frames": 60,
+      "in_place": 60,
+      "off_roi": 0,
+      "dropouts": 0,
+      "max_anchor_jump_px": 0,
+      "roi_in_mask_min_permille": 982,
+      "first_not_in_place_s": null
+     },
+     "motion_pct": {
+      "players": 3,
+      "hud": 0,
+      "rest": 97
+     },
+     "caption": "Motion was players 3% [seen.motion.players_pct], HUD 0% [seen.motion.hud_pct], rest 97% [seen.motion.rest_pct]. Scorebug stayed in place [seen.scorebug.in_place, seen.scorebug.frames].",
+     "caption_source": "muse-spark-1.3"
+    },
+    {
+     "seq": 454,
+     "segment_sha256": "e2ac75f3f30916859b64670997005dea54e122785e15c00c21094b96d9edf384",
+     "t0": 4.191,
+     "t1": 6.191,
+     "scorebug": {
+      "frames": 60,
+      "in_place": 60,
+      "off_roi": 0,
+      "dropouts": 0,
+      "max_anchor_jump_px": 0,
+      "roi_in_mask_min_permille": 933,
+      "first_not_in_place_s": null
+     },
+     "motion_pct": {
+      "players": 7,
+      "hud": 0,
+      "rest": 93
+     },
+     "caption": "Motion was players 7% [seen.motion.players_pct], HUD 0% [seen.motion.hud_pct], rest 93% [seen.motion.rest_pct]. Scorebug stayed in place [seen.scorebug.in_place, seen.scorebug.frames].",
+     "caption_source": "muse-spark-1.3"
+    },
+    {
+     "seq": 455,
+     "segment_sha256": "1e62cf33ec09ccc43731f30540348c610e38e6146cc417ca9c1ba40c8bc434c2",
+     "t0": 6.19,
+     "t1": 8.19,
+     "scorebug": {
+      "frames": 60,
+      "in_place": 60,
+      "off_roi": 0,
+      "dropouts": 0,
+      "max_anchor_jump_px": 1,
+      "roi_in_mask_min_permille": 857,
+      "first_not_in_place_s": null
+     },
+     "motion_pct": {
+      "players": 0,
+      "hud": 0,
+      "rest": 100
+     },
+     "caption": "Motion was players 0% [seen.motion.players_pct], HUD 0% [seen.motion.hud_pct], rest 100% [seen.motion.rest_pct]. Scorebug stayed in place [seen.scorebug.in_place, seen.scorebug.frames].",
+     "caption_source": "muse-spark-1.3"
+    },
+    {
+     "seq": 456,
+     "segment_sha256": "19225039dff630515df8261cb938fd8f0818f6948dbf70fedf67c1c6d3051705",
+     "t0": 8.184,
+     "t1": 10.184,
+     "scorebug": {
+      "frames": 60,
+      "in_place": 3,
+      "off_roi": 19,
+      "dropouts": 38,
+      "max_anchor_jump_px": 0,
+      "roi_in_mask_min_permille": 978,
+      "first_not_in_place_s": 8.3
+     },
+     "motion_pct": {
+      "players": 13,
+      "hud": 12,
+      "rest": 75
+     },
+     "caption": "Motion was players 13% [seen.motion.players_pct], HUD 12% [seen.motion.hud_pct], rest 75% [seen.motion.rest_pct]. Scorebug was not in place on every frame [seen.scorebug.in_place, seen.scorebug.frames].",
+     "caption_source": "muse-spark-1.3"
+    },
+    {
+     "seq": 457,
+     "segment_sha256": "63a6a0a671dbb9b27cd50785b9ced2718377adeb3ce6ed5ba39ee2718a441b4b",
+     "t0": 10.193,
+     "t1": 12.0,
+     "scorebug": {
+      "frames": 54,
+      "in_place": 0,
+      "off_roi": 54,
+      "dropouts": 0,
+      "max_anchor_jump_px": null,
+      "roi_in_mask_min_permille": null,
+      "first_not_in_place_s": 10.2
+     },
+     "motion_pct": {
+      "players": 19,
+      "hud": 0,
+      "rest": 81
+     },
+     "caption": "Motion was players 19% [seen.motion.players_pct], HUD 0% [seen.motion.hud_pct], rest 81% [seen.motion.rest_pct]. Scorebug was not in place on every frame [seen.scorebug.in_place, seen.scorebug.frames].",
+     "caption_source": "muse-spark-1.3"
+    }
+   ],
+   "lens_events": [
+    {
+     "kind": "motion_segment",
+     "t0": 6.19,
+     "t1": 8.19,
+     "track": "players",
+     "seq": 455,
+     "cite": "signals.motion_permille.away",
+     "box_ref": [
+      315,
+      299,
+      326,
+      337
+     ]
+    },
+    {
+     "kind": "score_lock",
+     "t0": 8.0,
+     "t1": 10.5,
+     "track": "scorebug",
+     "score": {
+      "away": 10,
+      "home": 0
+     },
+     "cite": "checkpoints.away[467]",
+     "box_ref": [
+      0,
+      337,
+      499,
+      360
+     ]
+    }
+   ],
+   "overlay": {
+    "file": "hl02-q4-a10-h0.seen.mp4",
+    "sha256": "fb229765d30551364bd2e5343e5ac33b8c3945891169b7d084beff3938d18681",
+    "bytes": 2506742
+   }
+  }
+ ],
+ "cost_usd_est": {
+  "sam": 0.4316
+ }
+}
