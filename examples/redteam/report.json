@@ -1,0 +1,471 @@
+{
+ "schema": "qortime-redteam-report/v1",
+ "verifier": "qor_receipt.receipt.verify_receipt (pre-existing, pinned qortime@0e87ec3, unmodified)",
+ "keys": "fresh in-memory TEST keys per run; TEST allowlist in a temp file; no real keys or live referee",
+ "baseline": {
+  "status": "VERIFIED",
+  "match": "qor_receipt.demo synthetic dual match (no real players)"
+ },
+ "generator": {
+  "model": "muse-wonder-1.0",
+  "reasoning_effort": "low",
+  "usage": {
+   "prompt_tokens": 2443,
+   "completion_tokens": 3342,
+   "reasoning_tokens": 703
+  },
+  "usd_est": 0.076612,
+  "generated": "2026-10-27",
+  "note": "cached model output; tests and the CLI replay it offline"
+ },
+ "attacks_total": 26,
+ "attacks_tested": 25,
+ "accepted": 0,
+ "invalid": 0,
+ "no_tamper": 1,
+ "headline": "25 attacks · 0 accepted",
+ "rows": [
+  {
+   "id": "score_edit_unsigned",
+   "category": "edit",
+   "description": "Increase home score from 24 to 31 without re-signing.",
+   "resign": "none",
+   "pin": "honest",
+   "outcome": "rejected",
+   "accepted": false,
+   "status": "FAIL",
+   "reasons": [
+    "bad_referee_signature",
+    "bad_player_signature:away",
+    "bad_player_signature:home"
+   ]
+  },
+  {
+   "id": "winner_flip_unsigned",
+   "category": "edit",
+   "description": "Flip winner to away despite home leading 24-17 without re-signing.",
+   "resign": "none",
+   "pin": "honest",
+   "outcome": "rejected",
+   "accepted": false,
+   "status": "FAIL",
+   "reasons": [
+    "bad_referee_signature",
+    "bad_player_signature:away",
+    "bad_player_signature:home",
+    "winner_inconsistent"
+   ]
+  },
+  {
+   "id": "score_edit_attacker_sig_only",
+   "category": "forged_signature",
+   "description": "Edit score and replace only the referee signature with an attacker signature.",
+   "resign": "attacker_sig_only",
+   "pin": "honest",
+   "outcome": "rejected",
+   "accepted": false,
+   "status": "FAIL",
+   "reasons": [
+    "bad_referee_signature",
+    "bad_player_signature:away",
+    "bad_player_signature:home"
+   ]
+  },
+  {
+   "id": "score_edit_attacker_identity",
+   "category": "forged_signature",
+   "description": "Edit score, replace referee identity, and re-sign as attacker referee.",
+   "resign": "attacker_identity",
+   "pin": "honest",
+   "outcome": "rejected",
+   "accepted": false,
+   "status": "FAIL",
+   "reasons": [
+    "referee_key_mismatch",
+    "bad_player_signature:away",
+    "bad_player_signature:home",
+    "away:cp[*]:bad_referee_sig",
+    "home:cp[*]:bad_referee_sig",
+    "referee_not_on_allowlist"
+   ]
+  },
+  {
+   "id": "attacker_identity_pin_attacker",
+   "category": "pin_trick",
+   "description": "Re-sign a losing-score edit under attacker referee key and make verifier pin the attacker.",
+   "resign": "attacker_identity",
+   "pin": "attacker",
+   "outcome": "rejected",
+   "accepted": false,
+   "status": "FAIL",
+   "reasons": [
+    "bad_player_signature:away",
+    "bad_player_signature:home",
+    "away:cp[*]:bad_referee_sig",
+    "home:cp[*]:bad_referee_sig",
+    "referee_not_on_allowlist",
+    "referee_pin_not_allowlisted"
+   ]
+  },
+  {
+   "id": "attacker_identity_pin_none",
+   "category": "pin_trick",
+   "description": "Re-sign edited receipt as attacker referee and rely on verifier pinning no referee key.",
+   "resign": "attacker_identity",
+   "pin": "none",
+   "outcome": "rejected",
+   "accepted": false,
+   "status": "FAIL",
+   "reasons": [
+    "bad_player_signature:away",
+    "bad_player_signature:home",
+    "away:cp[*]:bad_referee_sig",
+    "home:cp[*]:bad_referee_sig",
+    "referee_key_not_pinned",
+    "referee_not_on_allowlist"
+   ]
+  },
+  {
+   "id": "attacker_identity_and_players_forgery",
+   "category": "forged_signature",
+   "description": "Rewrite score and re-sign as attacker referee and both attacker players.",
+   "resign": "attacker_identity_and_players",
+   "pin": "honest",
+   "outcome": "rejected",
+   "accepted": false,
+   "status": "FAIL",
+   "reasons": [
+    "referee_key_mismatch",
+    "away:cp[*]:bad_referee_sig",
+    "home:cp[*]:bad_referee_sig",
+    "referee_not_on_allowlist"
+   ]
+  },
+  {
+   "id": "full_donor_replay",
+   "category": "replay",
+   "description": "Replace the whole receipt with a donor receipt from another match by the same referee.",
+   "resign": "none",
+   "pin": "honest",
+   "outcome": "no_tamper_identical_to_honest",
+   "accepted": false,
+   "status": "VERIFIED",
+   "reasons": [
+    "canonical_bytes_identical_to_an_honest_receipt"
+   ]
+  },
+  {
+   "id": "match_id_swap_donor",
+   "category": "splice",
+   "description": "Copy only the donor match_id into this receipt to reroute the result.",
+   "resign": "none",
+   "pin": "honest",
+   "outcome": "rejected",
+   "accepted": false,
+   "status": "FAIL",
+   "reasons": [
+    "bad_referee_signature",
+    "bad_player_signature:away",
+    "bad_player_signature:home",
+    "away:cp[*]:bad_referee_sig",
+    "home:cp[*]:bad_referee_sig"
+   ]
+  },
+  {
+   "id": "result_splice_donor",
+   "category": "splice",
+   "description": "Copy the donor result block into this receipt while keeping this match metadata.",
+   "resign": "none",
+   "pin": "honest",
+   "outcome": "rejected",
+   "accepted": false,
+   "status": "FAIL",
+   "reasons": [
+    "bad_referee_signature",
+    "bad_player_signature:away",
+    "bad_player_signature:home"
+   ]
+  },
+  {
+   "id": "checkpoint_splice_donor",
+   "category": "splice",
+   "description": "Copy donor home checkpoints into this receipt to fabricate frame history.",
+   "resign": "none",
+   "pin": "honest",
+   "outcome": "rejected",
+   "accepted": false,
+   "status": "FAIL",
+   "reasons": [
+    "bad_referee_signature",
+    "bad_player_signature:away",
+    "bad_player_signature:home",
+    "home:cp[*]:bad_referee_sig",
+    "home:cp[*]:gap_too_long",
+    "home:kickoff:challenge_not_bound_to_live_checkpoint"
+   ]
+  },
+  {
+   "id": "challenge_splice_donor",
+   "category": "splice",
+   "description": "Copy donor challenges into this receipt to reuse passed human-presence evidence.",
+   "resign": "none",
+   "pin": "honest",
+   "outcome": "rejected",
+   "accepted": false,
+   "status": "FAIL",
+   "reasons": [
+    "bad_referee_signature",
+    "bad_player_signature:away",
+    "bad_player_signature:home",
+    "away:kickoff:challenge_not_bound_to_live_checkpoint",
+    "away:halftime:challenge_not_bound_to_live_checkpoint",
+    "away:end:challenge_not_bound_to_live_checkpoint"
+   ]
+  },
+  {
+   "id": "drop_failed_challenge",
+   "category": "deletion",
+   "description": "Delete the first challenge entry to hide its evidence from review.",
+   "resign": "none",
+   "pin": "honest",
+   "outcome": "rejected",
+   "accepted": false,
+   "status": "FAIL",
+   "reasons": [
+    "bad_referee_signature",
+    "bad_player_signature:away",
+    "bad_player_signature:home",
+    "away:challenge_missing:kickoff"
+   ]
+  },
+  {
+   "id": "reorder_challenges",
+   "category": "reorder",
+   "description": "Reverse the challenges list to confuse role and phase ordering.",
+   "resign": "none",
+   "pin": "honest",
+   "outcome": "rejected",
+   "accepted": false,
+   "status": "FAIL",
+   "reasons": [
+    "bad_referee_signature",
+    "bad_player_signature:away",
+    "bad_player_signature:home"
+   ]
+  },
+  {
+   "id": "drop_first_checkpoint",
+   "category": "deletion",
+   "description": "Delete the first home checkpoint to remove early frame evidence.",
+   "resign": "none",
+   "pin": "honest",
+   "outcome": "rejected",
+   "accepted": false,
+   "status": "FAIL",
+   "reasons": [
+    "bad_referee_signature",
+    "bad_player_signature:away",
+    "bad_player_signature:home",
+    "home:cp[*]:seq_gap",
+    "home:cp[*]:prev_mismatch"
+   ]
+  },
+  {
+   "id": "reorder_checkpoints",
+   "category": "reorder",
+   "description": "Move the first home checkpoint to second position to break sequencing.",
+   "resign": "none",
+   "pin": "honest",
+   "outcome": "rejected",
+   "accepted": false,
+   "status": "FAIL",
+   "reasons": [
+    "bad_referee_signature",
+    "bad_player_signature:away",
+    "bad_player_signature:home",
+    "home:cp[*]:seq_gap",
+    "home:cp[*]:prev_mismatch",
+    "home:cp[*]:referee_time_backwards"
+   ]
+  },
+  {
+   "id": "checkpoint_hash_edit",
+   "category": "checkpoint_chain",
+   "description": "Zero out a home checkpoint hash while leaving the rest of the chain intact.",
+   "resign": "none",
+   "pin": "honest",
+   "outcome": "rejected",
+   "accepted": false,
+   "status": "FAIL",
+   "reasons": [
+    "bad_referee_signature",
+    "bad_player_signature:away",
+    "bad_player_signature:home",
+    "home:cp[*]:hash_mismatch",
+    "home:cp[*]:bad_referee_sig",
+    "home:cp[*]:prev_mismatch"
+   ]
+  },
+  {
+   "id": "checkpoint_prev_break",
+   "category": "checkpoint_chain",
+   "description": "Rewrite the second home checkpoint prev pointer to hide a missing frame segment.",
+   "resign": "none",
+   "pin": "honest",
+   "outcome": "rejected",
+   "accepted": false,
+   "status": "FAIL",
+   "reasons": [
+    "bad_referee_signature",
+    "bad_player_signature:away",
+    "bad_player_signature:home",
+    "home:cp[*]:prev_mismatch",
+    "home:cp[*]:hash_mismatch"
+   ]
+  },
+  {
+   "id": "timestamp_shift_start",
+   "category": "timestamp_splice",
+   "description": "Shift match start one hour earlier to make stale evidence appear timely.",
+   "resign": "none",
+   "pin": "honest",
+   "outcome": "rejected",
+   "accepted": false,
+   "status": "FAIL",
+   "reasons": [
+    "bad_referee_signature",
+    "bad_player_signature:away",
+    "bad_player_signature:home",
+    "away:cp[*]:gap_too_long",
+    "home:cp[*]:gap_too_long"
+   ]
+  },
+  {
+   "id": "final_time_after_end",
+   "category": "timestamp_splice",
+   "description": "Shift result final time beyond match ended time.",
+   "resign": "none",
+   "pin": "honest",
+   "outcome": "rejected",
+   "accepted": false,
+   "status": "FAIL",
+   "reasons": [
+    "bad_referee_signature",
+    "bad_player_signature:away",
+    "bad_player_signature:home"
+   ]
+  },
+  {
+   "id": "challenge_latency_edit",
+   "category": "challenge_evidence",
+   "description": "Set a challenge latency to zero and keep ok true to launder superhuman input timing.",
+   "resign": "none",
+   "pin": "honest",
+   "outcome": "rejected",
+   "accepted": false,
+   "status": "FAIL",
+   "reasons": [
+    "bad_referee_signature",
+    "bad_player_signature:away",
+    "bad_player_signature:home"
+   ]
+  },
+  {
+   "id": "trust_tier_upgrade",
+   "category": "trust_downgrade_upgrade",
+   "description": "Upgrade trust_tier to a fabricated hardware tier without changing any keys.",
+   "resign": "none",
+   "pin": "honest",
+   "outcome": "rejected",
+   "accepted": false,
+   "status": "FAIL",
+   "reasons": [
+    "bad_referee_signature",
+    "bad_player_signature:away",
+    "bad_player_signature:home",
+    "trust_tier_claim_wrong"
+   ]
+  },
+  {
+   "id": "referee_key_kind_upgrade",
+   "category": "trust_downgrade_upgrade",
+   "description": "Change referee key_kind from software to hardware to claim stronger custody.",
+   "resign": "none",
+   "pin": "honest",
+   "outcome": "rejected",
+   "accepted": false,
+   "status": "FAIL",
+   "reasons": [
+    "bad_referee_signature",
+    "bad_player_signature:away",
+    "bad_player_signature:home"
+   ]
+  },
+  {
+   "id": "signal_laundering_delete",
+   "category": "signal_laundering",
+   "description": "Delete motion signals and set timelines_agree true to hide automation or desync evidence.",
+   "resign": "none",
+   "pin": "honest",
+   "outcome": "rejected",
+   "accepted": false,
+   "status": "FAIL",
+   "reasons": [
+    "bad_referee_signature",
+    "bad_player_signature:away",
+    "bad_player_signature:home",
+    "away:motion_signal_missing",
+    "home:motion_signal_missing"
+   ]
+  },
+  {
+   "id": "score_type_confusion",
+   "category": "type_confusion",
+   "description": "Change home_score to the string 24 to exploit loose numeric parsing.",
+   "resign": "none",
+   "pin": "honest",
+   "outcome": "rejected",
+   "accepted": false,
+   "status": "FAIL",
+   "reasons": [
+    "bad_referee_signature",
+    "bad_player_signature:away",
+    "bad_player_signature:home",
+    "score_not_nonneg_int"
+   ]
+  },
+  {
+   "id": "duplicate_role_and_pubkey_swap",
+   "category": "duplicate_role",
+   "description": "Make both players role home and swap their pubkeys to take over the winning identity.",
+   "resign": "none",
+   "pin": "honest",
+   "outcome": "rejected",
+   "accepted": false,
+   "status": "FAIL",
+   "reasons": [
+    "bad_referee_signature",
+    "bad_player_signature:away",
+    "bad_player_signature:home"
+   ]
+  }
+ ],
+ "explanations": [
+  {
+   "case": "honest",
+   "verdict": "VERIFIED",
+   "model": "muse-spark-1.3",
+   "shown": true,
+   "text": "The referee returned VERIFIED [verdict].\nHome won 24 to 17 in quarter 4 [result.winner] [result.home_score] [result.away_score] [result.quarter].\nAll 6 challenges passed with 94 checkpoints from away and 94 from home [challenges.count] [challenges.passed] [checkpoints.away.count] [checkpoints.home.count] [signatures.players].\nThis does not prove who held the controller [players.count] [signatures.players].",
+   "problems": []
+  },
+  {
+   "case": "score_edit_unsigned",
+   "verdict": "FAIL",
+   "model": "muse-spark-1.3",
+   "shown": true,
+   "text": "The referee returned FAIL [verdict].\nThe listed problems were bad_referee_signature and bad_player_signature:away and bad_player_signature:home [errors].\nThe reported score was 31 for home and 17 for away with winner home in quarter 4 [result.home_score] [result.away_score] [result.winner] [result.quarter].\nThis result does not prove who held the controller [players.count] [trust_tier].",
+   "problems": []
+  }
+ ]
+}

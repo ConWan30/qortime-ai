@@ -36,6 +36,7 @@ The only pre-existing data used is the public receipt of match 170123, fetched f
 | Advisory fetch from the referee + verifier auto-pin of trusted referee keys | `web/advisory-fetch.js`, `web/auto-pin.js`, `web/AUTO_PIN.md` | — | none |
 | Browser panels for the three signed advisory files | `web/*-view.js`, `web/advisory-panels.css`, `web/demo.html`, `web/demo-170123.mjs` | — | display only |
 | Demo-video captions timed by ASR | `demo_pipeline/captions/` | Muse Voice Transcribe 1.0 | n/a (video only) |
+| Red-Team the Referee: Muse Wonder writes 26 receipt-tampering attacks (cached), the pre-existing verifier judges them against fresh TEST keys; Muse Spark explanations must cite a field in every sentence, checked by code + banned-word filter | `qortime_ai/redteam/`, `examples/redteam/` | Muse Wonder 1.0, Muse Spark 1.3 | none (attacks the verifier; never edits it) |
 | Signed advisory files for match 170123 | `examples/170123/{ai_ruling,score_crosscheck,hands}.json` | Muse Spark 1.3 | — |
 
 File-by-file origin (qortime PR numbers): [`PROVENANCE.md`](PROVENANCE.md).
@@ -49,7 +50,23 @@ File-by-file origin (qortime PR numbers): [`PROVENANCE.md`](PROVENANCE.md).
 - **SAM 3.1** — boxes the scorebug for viewers. Info only; never a status signal.
 - **Muse Voice Transcribe 1.0** — event-stream ASR of the demo narration; each partial's `audioProcessedMs` times the
   burned-in captions (`demo_pipeline/captions/make_srt.py`, reproduces `data/vo-v6-captions.srt` byte-for-byte).
+- **Muse Wonder 1.0** — red-team attacker: proposes receipt tampering attacks as structured JSON mutations (see below).
 - Keys come only from the environment (`META_API_KEY`); nothing in this repo contains a key.
+
+## Red-Team the Referee
+`python -m qortime_ai.redteam` → **25 attacks · 0 accepted** (plus 1 pure replay that is byte-identical to an honest
+receipt, reported separately). Muse Wonder 1.0 proposed 26 attacks once (forged / re-signed signatures, score and winner
+edits, match-id swap, donor splices, dropped and reordered checkpoints and challenges, timestamp shifts, trust-tier and
+key-kind upgrades, signal laundering, type confusion, pin tricks); the output is cached in
+`qortime_ai/redteam/fixtures/wonder_attacks.json` so the run is offline and deterministic. Each attack is applied to a
+synthetic dual match played through the pre-existing referee service with **freshly generated in-memory TEST keys**
+(never a real key, never the live referee, no real match data), then judged by the unmodified pre-existing
+`verify_receipt`. An attack counts as accepted only if tampered content comes back VERIFIED.
+Muse Spark 1.3 then explains the honest and a tampered result; every sentence must cite the fact field(s) it uses
+(`[verdict]`, `[result.home_score]` …), and code rejects missing/unknown citations, numbers, statuses or winners the
+cited fields do not support, and overclaim words ("attested", "hardware-verified", "certified", "guaranteed",
+"proven cheat-free" …) in any AI-written text. Output: `examples/redteam/report.json`, `summary.md`.
+Refresh the fixtures (live, ≈ $0.10): `META_API_KEY=... python -m qortime_ai.redteam --generate`.
 
 ## Run it
 Requires Python ≥ 3.10, Node ≥ 20, git. No API key needed for tests or the demo.
@@ -57,7 +74,7 @@ Requires Python ≥ 3.10, Node ≥ 20, git. No API key needed for tests or the d
 ./scripts/fetch_upstream.sh            # pre-existing qortime @ 0e87ec3 -> upstream/ (git-ignored) + 170123 receipt
 python -m venv .venv && . .venv/bin/activate
 pip install -e '.[dev]'                # installs the pinned pre-existing qor-receipt library as a dependency
-pytest -q                              # 138 passed, 5 skipped (referee-hook integration tests live upstream)
+pytest -q                              # 161 passed, 5 skipped (referee-hook integration tests live upstream)
 npm test                               # 5 browser-module test files, 125 checks
 node web/demo-170123.mjs               # offline: verdict from verify.js, then the signed Muse files, lower-only
 python -m http.server 8000             # then open http://localhost:8000/web/demo.html
