@@ -36,7 +36,7 @@ The only pre-existing data used is the public receipt of match 170123, fetched f
 | Advisory fetch from the referee + verifier auto-pin of trusted referee keys | `web/advisory-fetch.js`, `web/auto-pin.js`, `web/AUTO_PIN.md` | — | none |
 | Browser panels for the three signed advisory files | `web/*-view.js`, `web/advisory-panels.css`, `web/demo.html`, `web/demo-170123.mjs` | — | display only |
 | Demo-video captions timed by ASR | `demo_pipeline/captions/` | Muse Voice Transcribe 1.0 | n/a (video only) |
-| Red-Team the Referee: Muse Wonder writes 26 receipt-tampering attacks (cached), the pre-existing verifier judges them against fresh TEST keys; Muse Spark explanations must cite a field in every sentence, checked by code + banned-word filter | `qortime_ai/redteam/`, `examples/redteam/` | Muse Wonder 1.0, Muse Spark 1.3 | none (attacks the verifier; never edits it) |
+| Red-Team the Referee: Muse Wonder writes 26 receipt-tampering attacks (cached), the pre-existing verifier judges them against fresh TEST keys, as an outside attacker and as an insider holding the TEST signing keys; Muse Spark explanations must cite a field in every sentence, checked by code + banned-word filter | `qortime_ai/redteam/`, `examples/redteam/` | Muse Wonder 1.0, Muse Spark 1.3 | none (attacks the verifier; never edits it) |
 | Signed advisory files for match 170123 | `examples/170123/{ai_ruling,score_crosscheck,hands}.json` | Muse Spark 1.3 | — |
 
 File-by-file origin (qortime PR numbers): [`PROVENANCE.md`](PROVENANCE.md).
@@ -54,7 +54,8 @@ File-by-file origin (qortime PR numbers): [`PROVENANCE.md`](PROVENANCE.md).
 - Keys come only from the environment (`META_API_KEY`); nothing in this repo contains a key.
 
 ## Red-Team the Referee
-`python -m qortime_ai.redteam` → **25 attacks · 0 accepted** (plus 1 pure replay that is byte-identical to an honest
+`python -m qortime_ai.redteam` → **Outside attacker: 25 attacks · 0 accepted** and
+**Insider with signing keys: 25 attacks · 12 accepted** (plus 1 pure replay that is byte-identical to an honest
 receipt, reported separately). Muse Wonder 1.0 proposed 26 attacks once (forged / re-signed signatures, score and winner
 edits, match-id swap, donor splices, dropped and reordered checkpoints and challenges, timestamp shifts, trust-tier and
 key-kind upgrades, signal laundering, type confusion, pin tricks); the output is cached in
@@ -66,6 +67,16 @@ Muse Spark 1.3 then explains the honest and a tampered result; every sentence mu
 (`[verdict]`, `[result.home_score]` …), and code rejects missing/unknown citations, numbers, statuses or winners the
 cited fields do not support, and overclaim words ("attested", "hardware-verified", "certified", "guaranteed",
 "proven cheat-free" …) in any AI-written text. Output: `examples/redteam/report.json`, `summary.md`.
+**Insider pass:** every attack is also re-run with the tampered receipt re-signed by the TEST referee and TEST player
+keys (an insider who holds signing keys; checkpoint countersignatures and challenge tokens are not re-forged), so the
+inner checks run on their own. They still stop 13 of 25: checkpoint hash chain (seq gap, prev/hash mismatch, time
+backwards), timing gaps, winner/score consistency, integer type checks, trust-tier recomputation, missing challenges,
+challenges not bound to a live checkpoint, missing motion signals. The 12 accepted are labelled **needs key protection
+(out of scope for the verifier)**: 6 are plain re-signed score edits (a key holder can sign anything), 1 is a benign
+challenge reorder, and 5 are reported inner-check gaps in the pre-existing verifier, left unchanged here:
+`result.final_t_ms` outside the match window (2), challenge `hid_sha256` only format-checked, free-text
+`referee.key_kind`, and player pubkeys swappable between roles because checkpoint chains are checked only against the
+referee countersignature. Per-attack notes are in `examples/redteam/summary.md`.
 Refresh the fixtures (live, ≈ $0.10): `META_API_KEY=... python -m qortime_ai.redteam --generate`.
 
 ## Run it
@@ -74,7 +85,7 @@ Requires Python ≥ 3.10, Node ≥ 20, git. No API key needed for tests or the d
 ./scripts/fetch_upstream.sh            # pre-existing qortime @ 0e87ec3 -> upstream/ (git-ignored) + 170123 receipt
 python -m venv .venv && . .venv/bin/activate
 pip install -e '.[dev]'                # installs the pinned pre-existing qor-receipt library as a dependency
-pytest -q                              # 161 passed, 5 skipped (referee-hook integration tests live upstream)
+pytest -q                              # 163 passed, 5 skipped (referee-hook integration tests live upstream)
 npm test                               # 5 browser-module test files, 125 checks
 node web/demo-170123.mjs               # offline: verdict from verify.js, then the signed Muse files, lower-only
 python -m http.server 8000             # then open http://localhost:8000/web/demo.html

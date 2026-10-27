@@ -23,7 +23,25 @@
  "accepted": 0,
  "invalid": 0,
  "no_tamper": 1,
- "headline": "25 attacks · 0 accepted",
+ "headline": "Outside attacker: 25 attacks · 0 accepted",
+ "insider_tested": 25,
+ "insider_accepted": 12,
+ "insider_accepted_ids": [
+  "score_edit_unsigned",
+  "score_edit_attacker_sig_only",
+  "score_edit_attacker_identity",
+  "attacker_identity_pin_attacker",
+  "attacker_identity_pin_none",
+  "attacker_identity_and_players_forgery",
+  "result_splice_donor",
+  "reorder_challenges",
+  "final_time_after_end",
+  "challenge_latency_edit",
+  "referee_key_kind_upgrade",
+  "duplicate_role_and_pubkey_swap"
+ ],
+ "headline_insider": "Insider with signing keys: 25 attacks · 12 accepted",
+ "insider_note": "Insider pass: the tampered receipt is re-signed with the TEST referee and TEST player keys; checkpoint countersignatures and challenge tokens are not re-forged. An accepted insider forgery means needs key protection (out of scope for the verifier), not a verifier bug.",
  "rows": [
   {
    "id": "score_edit_unsigned",
@@ -38,7 +56,15 @@
     "bad_referee_signature",
     "bad_player_signature:away",
     "bad_player_signature:home"
-   ]
+   ],
+   "insider": {
+    "outcome": "ACCEPTED",
+    "accepted": true,
+    "status": "VERIFIED",
+    "reasons": [],
+    "label": "needs key protection (out of scope for the verifier)",
+    "note": "key holder can sign any content: expected"
+   }
   },
   {
    "id": "winner_flip_unsigned",
@@ -54,7 +80,15 @@
     "bad_player_signature:away",
     "bad_player_signature:home",
     "winner_inconsistent"
-   ]
+   ],
+   "insider": {
+    "outcome": "rejected",
+    "accepted": false,
+    "status": "FAIL",
+    "reasons": [
+     "winner_inconsistent"
+    ]
+   }
   },
   {
    "id": "score_edit_attacker_sig_only",
@@ -69,7 +103,15 @@
     "bad_referee_signature",
     "bad_player_signature:away",
     "bad_player_signature:home"
-   ]
+   ],
+   "insider": {
+    "outcome": "ACCEPTED",
+    "accepted": true,
+    "status": "VERIFIED",
+    "reasons": [],
+    "label": "needs key protection (out of scope for the verifier)",
+    "note": "key holder can sign any content: expected"
+   }
   },
   {
    "id": "score_edit_attacker_identity",
@@ -87,7 +129,15 @@
     "away:cp[*]:bad_referee_sig",
     "home:cp[*]:bad_referee_sig",
     "referee_not_on_allowlist"
-   ]
+   ],
+   "insider": {
+    "outcome": "ACCEPTED",
+    "accepted": true,
+    "status": "VERIFIED",
+    "reasons": [],
+    "label": "needs key protection (out of scope for the verifier)",
+    "note": "key holder can sign any content: expected"
+   }
   },
   {
    "id": "attacker_identity_pin_attacker",
@@ -105,7 +155,15 @@
     "home:cp[*]:bad_referee_sig",
     "referee_not_on_allowlist",
     "referee_pin_not_allowlisted"
-   ]
+   ],
+   "insider": {
+    "outcome": "ACCEPTED",
+    "accepted": true,
+    "status": "VERIFIED",
+    "reasons": [],
+    "label": "needs key protection (out of scope for the verifier)",
+    "note": "key holder can sign any content: expected"
+   }
   },
   {
    "id": "attacker_identity_pin_none",
@@ -123,7 +181,15 @@
     "home:cp[*]:bad_referee_sig",
     "referee_key_not_pinned",
     "referee_not_on_allowlist"
-   ]
+   ],
+   "insider": {
+    "outcome": "ACCEPTED",
+    "accepted": true,
+    "status": "VERIFIED",
+    "reasons": [],
+    "label": "needs key protection (out of scope for the verifier)",
+    "note": "key holder can sign any content: expected"
+   }
   },
   {
    "id": "attacker_identity_and_players_forgery",
@@ -139,7 +205,15 @@
     "away:cp[*]:bad_referee_sig",
     "home:cp[*]:bad_referee_sig",
     "referee_not_on_allowlist"
-   ]
+   ],
+   "insider": {
+    "outcome": "ACCEPTED",
+    "accepted": true,
+    "status": "VERIFIED",
+    "reasons": [],
+    "label": "needs key protection (out of scope for the verifier)",
+    "note": "key holder can sign any content: expected"
+   }
   },
   {
    "id": "full_donor_replay",
@@ -152,7 +226,15 @@
    "status": "VERIFIED",
    "reasons": [
     "canonical_bytes_identical_to_an_honest_receipt"
-   ]
+   ],
+   "insider": {
+    "outcome": "no_tamper_identical_to_honest",
+    "accepted": false,
+    "status": "VERIFIED",
+    "reasons": [
+     "canonical_bytes_identical_to_an_honest_receipt"
+    ]
+   }
   },
   {
    "id": "match_id_swap_donor",
@@ -169,7 +251,16 @@
     "bad_player_signature:home",
     "away:cp[*]:bad_referee_sig",
     "home:cp[*]:bad_referee_sig"
-   ]
+   ],
+   "insider": {
+    "outcome": "rejected",
+    "accepted": false,
+    "status": "FAIL",
+    "reasons": [
+     "away:cp[*]:bad_referee_sig",
+     "home:cp[*]:bad_referee_sig"
+    ]
+   }
   },
   {
    "id": "result_splice_donor",
@@ -184,7 +275,15 @@
     "bad_referee_signature",
     "bad_player_signature:away",
     "bad_player_signature:home"
-   ]
+   ],
+   "insider": {
+    "outcome": "ACCEPTED",
+    "accepted": true,
+    "status": "VERIFIED",
+    "reasons": [],
+    "label": "needs key protection (out of scope for the verifier)",
+    "note": "inner-check gap: donor result.final_t_ms lies outside this match's window and is not rejected"
+   }
   },
   {
    "id": "checkpoint_splice_donor",
@@ -202,7 +301,19 @@
     "home:cp[*]:bad_referee_sig",
     "home:cp[*]:gap_too_long",
     "home:kickoff:challenge_not_bound_to_live_checkpoint"
-   ]
+   ],
+   "insider": {
+    "outcome": "rejected",
+    "accepted": false,
+    "status": "FAIL",
+    "reasons": [
+     "home:cp[*]:bad_referee_sig",
+     "home:cp[*]:gap_too_long",
+     "home:kickoff:challenge_not_bound_to_live_checkpoint",
+     "home:halftime:challenge_not_bound_to_live_checkpoint",
+     "home:end:challenge_not_bound_to_live_checkpoint"
+    ]
+   }
   },
   {
    "id": "challenge_splice_donor",
@@ -220,7 +331,20 @@
     "away:kickoff:challenge_not_bound_to_live_checkpoint",
     "away:halftime:challenge_not_bound_to_live_checkpoint",
     "away:end:challenge_not_bound_to_live_checkpoint"
-   ]
+   ],
+   "insider": {
+    "outcome": "rejected",
+    "accepted": false,
+    "status": "PARTIAL",
+    "reasons": [
+     "away:kickoff:challenge_not_bound_to_live_checkpoint",
+     "away:halftime:challenge_not_bound_to_live_checkpoint",
+     "away:end:challenge_not_bound_to_live_checkpoint",
+     "home:kickoff:challenge_not_bound_to_live_checkpoint",
+     "home:halftime:challenge_not_bound_to_live_checkpoint",
+     "home:end:challenge_not_bound_to_live_checkpoint"
+    ]
+   }
   },
   {
    "id": "drop_failed_challenge",
@@ -235,8 +359,16 @@
     "bad_referee_signature",
     "bad_player_signature:away",
     "bad_player_signature:home",
-    "away:challenge_missing:kickoff"
-   ]
+    "home:challenge_missing:kickoff"
+   ],
+   "insider": {
+    "outcome": "rejected",
+    "accepted": false,
+    "status": "PARTIAL",
+    "reasons": [
+     "home:challenge_missing:kickoff"
+    ]
+   }
   },
   {
    "id": "reorder_challenges",
@@ -251,7 +383,15 @@
     "bad_referee_signature",
     "bad_player_signature:away",
     "bad_player_signature:home"
-   ]
+   ],
+   "insider": {
+    "outcome": "ACCEPTED",
+    "accepted": true,
+    "status": "VERIFIED",
+    "reasons": [],
+    "label": "needs key protection (out of scope for the verifier)",
+    "note": "benign: same challenges in a different list order"
+   }
   },
   {
    "id": "drop_first_checkpoint",
@@ -268,7 +408,16 @@
     "bad_player_signature:home",
     "home:cp[*]:seq_gap",
     "home:cp[*]:prev_mismatch"
-   ]
+   ],
+   "insider": {
+    "outcome": "rejected",
+    "accepted": false,
+    "status": "FAIL",
+    "reasons": [
+     "home:cp[*]:seq_gap",
+     "home:cp[*]:prev_mismatch"
+    ]
+   }
   },
   {
    "id": "reorder_checkpoints",
@@ -286,7 +435,17 @@
     "home:cp[*]:seq_gap",
     "home:cp[*]:prev_mismatch",
     "home:cp[*]:referee_time_backwards"
-   ]
+   ],
+   "insider": {
+    "outcome": "rejected",
+    "accepted": false,
+    "status": "FAIL",
+    "reasons": [
+     "home:cp[*]:seq_gap",
+     "home:cp[*]:prev_mismatch",
+     "home:cp[*]:referee_time_backwards"
+    ]
+   }
   },
   {
    "id": "checkpoint_hash_edit",
@@ -304,7 +463,17 @@
     "home:cp[*]:hash_mismatch",
     "home:cp[*]:bad_referee_sig",
     "home:cp[*]:prev_mismatch"
-   ]
+   ],
+   "insider": {
+    "outcome": "rejected",
+    "accepted": false,
+    "status": "FAIL",
+    "reasons": [
+     "home:cp[*]:hash_mismatch",
+     "home:cp[*]:bad_referee_sig",
+     "home:cp[*]:prev_mismatch"
+    ]
+   }
   },
   {
    "id": "checkpoint_prev_break",
@@ -321,7 +490,16 @@
     "bad_player_signature:home",
     "home:cp[*]:prev_mismatch",
     "home:cp[*]:hash_mismatch"
-   ]
+   ],
+   "insider": {
+    "outcome": "rejected",
+    "accepted": false,
+    "status": "FAIL",
+    "reasons": [
+     "home:cp[*]:prev_mismatch",
+     "home:cp[*]:hash_mismatch"
+    ]
+   }
   },
   {
    "id": "timestamp_shift_start",
@@ -338,7 +516,16 @@
     "bad_player_signature:home",
     "away:cp[*]:gap_too_long",
     "home:cp[*]:gap_too_long"
-   ]
+   ],
+   "insider": {
+    "outcome": "rejected",
+    "accepted": false,
+    "status": "FAIL",
+    "reasons": [
+     "away:cp[*]:gap_too_long",
+     "home:cp[*]:gap_too_long"
+    ]
+   }
   },
   {
    "id": "final_time_after_end",
@@ -353,7 +540,15 @@
     "bad_referee_signature",
     "bad_player_signature:away",
     "bad_player_signature:home"
-   ]
+   ],
+   "insider": {
+    "outcome": "ACCEPTED",
+    "accepted": true,
+    "status": "VERIFIED",
+    "reasons": [],
+    "label": "needs key protection (out of scope for the verifier)",
+    "note": "inner-check gap: result.final_t_ms is not required to fall inside match.started_ms..ended_ms"
+   }
   },
   {
    "id": "challenge_latency_edit",
@@ -368,7 +563,15 @@
     "bad_referee_signature",
     "bad_player_signature:away",
     "bad_player_signature:home"
-   ]
+   ],
+   "insider": {
+    "outcome": "ACCEPTED",
+    "accepted": true,
+    "status": "VERIFIED",
+    "reasons": [],
+    "label": "needs key protection (out of scope for the verifier)",
+    "note": "inner-check gap: challenge result.hid_sha256 is only format-checked (the receipt carries no HID bytes, by design) and latency_ms 0 is in range"
+   }
   },
   {
    "id": "trust_tier_upgrade",
@@ -384,7 +587,15 @@
     "bad_player_signature:away",
     "bad_player_signature:home",
     "trust_tier_claim_wrong"
-   ]
+   ],
+   "insider": {
+    "outcome": "rejected",
+    "accepted": false,
+    "status": "FAIL",
+    "reasons": [
+     "trust_tier_claim_wrong"
+    ]
+   }
   },
   {
    "id": "referee_key_kind_upgrade",
@@ -399,7 +610,15 @@
     "bad_referee_signature",
     "bad_player_signature:away",
     "bad_player_signature:home"
-   ]
+   ],
+   "insider": {
+    "outcome": "ACCEPTED",
+    "accepted": true,
+    "status": "VERIFIED",
+    "reasons": [],
+    "label": "needs key protection (out of scope for the verifier)",
+    "note": "inner-check gap: referee.key_kind is free text; only 'tpm' is flagged as an unverified claim"
+   }
   },
   {
    "id": "signal_laundering_delete",
@@ -416,7 +635,16 @@
     "bad_player_signature:home",
     "away:motion_signal_missing",
     "home:motion_signal_missing"
-   ]
+   ],
+   "insider": {
+    "outcome": "rejected",
+    "accepted": false,
+    "status": "PARTIAL",
+    "reasons": [
+     "away:motion_signal_missing",
+     "home:motion_signal_missing"
+    ]
+   }
   },
   {
    "id": "score_type_confusion",
@@ -432,7 +660,15 @@
     "bad_player_signature:away",
     "bad_player_signature:home",
     "score_not_nonneg_int"
-   ]
+   ],
+   "insider": {
+    "outcome": "rejected",
+    "accepted": false,
+    "status": "FAIL",
+    "reasons": [
+     "score_not_nonneg_int"
+    ]
+   }
   },
   {
    "id": "duplicate_role_and_pubkey_swap",
@@ -447,7 +683,15 @@
     "bad_referee_signature",
     "bad_player_signature:away",
     "bad_player_signature:home"
-   ]
+   ],
+   "insider": {
+    "outcome": "ACCEPTED",
+    "accepted": true,
+    "status": "VERIFIED",
+    "reasons": [],
+    "label": "needs key protection (out of scope for the verifier)",
+    "note": "inner-check gap: player pubkeys are not bound to their checkpoint chains (only the referee countersignature is checked), so two players' keys can be swapped"
+   }
   }
  ],
  "explanations": [
