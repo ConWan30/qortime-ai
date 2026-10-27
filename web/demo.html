@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>QorTime AI — advisory panels demo (Meta AI Developer Hackathon)</title>
+<link rel="stylesheet" href="../upstream/qortime/verify/viewer.css">
+<link rel="stylesheet" href="advisory-panels.css">
+</head><body>
+<!-- Event-built demo page. Serve the repo root (python -m http.server) after scripts/fetch_upstream.sh, open /web/demo.html.
+     The verdict comes only from the pre-existing verify.js; everything below it is advisory and can only lower VERIFIED to PARTIAL. -->
+<main class="wrap">
+ <h1>QorTime AI: advisory panels</h1>
+ <p>Receipt: <code id="src"></code></p>
+ <label class="lbl" for="pub">Pinned referee key (optional; blank = auto-pin from the built-in trusted list only)</label>
+ <input type="text" id="pub" autocomplete="off" spellcheck="false">
+ <p><button type="button" class="btn primary" id="go">Verify</button></p>
+ <pre id="out" aria-live="polite"></pre>
+ <div class="panels" id="xcSlot"></div>
+ <div class="panels" id="handsSlot"></div>
+ <div class="panels" id="aiSlot"></div>
+</main>
+<script type="module">
+import { verifyReceipt } from "../upstream/qortime/verify/verify.js";
+import { autoPinFor, AUTO_PIN_NOTE } from "./auto-pin.js";
+import { checkAiRuling, aiRulingPanel } from "./ai-ruling-view.js";
+import { checkCrosscheck, applyCrosscheck, crosscheckPanel } from "./score-crosscheck-view.js";
+import { checkHands, applyHands, handsPanel } from "./hands-view.js";
+import { acceptLowerOnly } from "./lower-only.js";
+const $ = (id) => document.getElementById(id);
+const base = "../examples/170123/";
+$("src").textContent = base + "receipt.json";
+let receiptDoc = null;
+const currentReceipt = () => receiptDoc;
+const getJson = async (u) => { try { const r = await fetch(u); return r.ok ? await r.json() : null; } catch { return null; } };
+async function check() {
+  receiptDoc = await getJson(base + "receipt.json");
+  if (!receiptDoc) { $("out").textContent = "No receipt. Run scripts/fetch_upstream.sh first."; return; }
+  let pin = $("pub").value.trim() || null;
+  let auto = null;
+  if (!pin) { auto = await autoPinFor(currentReceipt()); pin = auto.pin; }
+  const v0 = await verifyReceipt(receiptDoc, pin);
+  const xc = await checkCrosscheck(await getJson(base + "score_crosscheck.json"), receiptDoc);
+  const hands = await checkHands(await getJson(base + "hands.json"), receiptDoc);
+  const v = acceptLowerOnly(v0, applyHands(applyCrosscheck(v0, xc), hands));
+  $("out").textContent = `verdict (verify.js): ${v0.status}\nshown after lower-only advisory signals: ${v.status}\n` + (auto && auto.pin ? AUTO_PIN_NOTE : "");
+  $("xcSlot").replaceChildren(crosscheckPanel(xc));
+  const hp = handsPanel(hands); $("handsSlot").replaceChildren(...(hp ? [hp] : []));
+  const ai = await checkAiRuling(await getJson(base + "ai_ruling.json"), receiptDoc, v0.status);
+  $("aiSlot").replaceChildren(...(ai.ok ? [aiRulingPanel(ai)] : []));
+}
+$("go").addEventListener("click", check);
+check();
+</script>
+</body></html>

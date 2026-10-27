@@ -1,0 +1,10 @@
+{
+  "name": "qortime-ai-web",
+  "private": true,
+  "type": "module",
+  "description": "Browser-side checks for QorTime's signed advisory files (event-built). Needs scripts/fetch_upstream.sh first.",
+  "scripts": {
+    "test": "for t in web/*.test.mjs; do node $t || exit 1; done",
+    "demo": "node web/demo-170123.mjs"
+  }
+}

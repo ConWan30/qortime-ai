@@ -1,0 +1,11 @@
+upstream/
+examples/170123/receipt.json
+__pycache__/
+*.egg-info/
+.venv/
+.pytest_cache/
+node_modules/
+*.wav
+*.mp4
+*.key
+.env

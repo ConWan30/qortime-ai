@@ -1,0 +1,41 @@
+{
+ "fetched_at": "2026-10-27T14:50:54-05:00",
+ "input": "demo-assets/voice/vo-v5-rex-final.wav (resampled to 24 kHz mono s16)",
+ "audio_s": 113.547,
+ "request": {
+  "model": "muse-voice-transcribe-1.0",
+  "audioEncoding": "WAV",
+  "mode": "ENDPOINTING",
+  "languageBias": [
+   "English"
+  ],
+  "keywords": [
+   "QorTime",
+   "QorCap",
+   "Muse Spark",
+   "SAM",
+   "Muse Voice Transcribe",
+   "Show Your Hands",
+   "scorebug",
+   "VERIFIED",
+   "PARTIAL",
+   "Madden",
+   "Call of Duty",
+   "Meta"
+  ]
+ },
+ "http": 200,
+ "response": {
+  "sessionId": "qortime-demo-v6-captions",
+  "transcript": "This is what proof looks like. QorTime anti-cheat and verified skill for console games. assigned receipt tying the score the the footage and the controller to one match match CoreCap records the match from the capture card and logs the controller over USB. The referee signs a a receipt and anyone can check it in the browser. browser open match 170123 and the verifier pins the trusted referee key by itself verified away 10 home nothing Meta's Muse Spark explains that result in plain English it's signed with a separate advisory key never the referee key edit the explanation and it disappears the verdict doesn't move Muse Spark is also the second score reader after every locked score it rereads the scorebug on its own on frames we never trained on it got 73 of 73 and was never and was never confidently wrong on this match it agrees now a test a tampered claim of seven to nothing Muse reads three to nothing and verified drops to partial it can lower a result never raise one or fail it tamper with the receipt itself and the signature breaks fail about a about a cent per match this is show your your hands the overlay is the real controller log from this match 31,000 reports in 471 chunks each one hashed into the receipt receipt press to pixel asks whether every play start has a press behind it not enough evidence to score so it scores nothing instead of flagging two legit plays Meta's SAM 3.1 draws draws the scorebug for viewers. It missed on two of six frames, so it never touches a verdict. Muse Spark explanations score cross checks and play start filtering Sam the scorebug visual Muse Voice Transcribe the captions you're reading we start with Madden where the data is next on the roadmap not built yet yet shooters like Call of Duty where the the same receipts could show the player's own stick drove the aim Core time doesn't prove who held the controller and it says so it does prove the score the the footage and the inputs belong to the same match that's verified skill core core time",
+  "audioDurationMs": 113600,
+  "turns": [
+   {
+    "turnId": 0,
+    "startMs": 0,
+    "endMs": 113020,
+    "transcript": "This is what proof looks like. QorTime anti-cheat and verified skill for console games. assigned receipt tying the score the the footage and the controller to one match match CoreCap records the match from the capture card and logs the controller over USB. The referee signs a a receipt and anyone can check it in the browser. browser open match 170123 and the verifier pins the trusted referee key by itself verified away 10 home nothing Meta's Muse Spark explains that result in plain English it's signed with a separate advisory key never the referee key edit the explanation and it disappears the verdict doesn't move Muse Spark is also the second score reader after every locked score it rereads the scorebug on its own on frames we never trained on it got 73 of 73 and was never and was never confidently wrong on this match it agrees now a test a tampered claim of seven to nothing Muse reads three to nothing and verified drops to partial it can lower a result never raise one or fail it tamper with the receipt itself and the signature breaks fail about a about a cent per match this is show your your hands the overlay is the real controller log from this match 31,000 reports in 471 chunks each one hashed into the receipt receipt press to pixel asks whether every play start has a press behind it not enough evidence to score so it scores nothing instead of flagging two legit plays Meta's SAM 3.1 draws draws the scorebug for viewers. It missed on two of six frames, so it never touches a verdict. Muse Spark explanations score cross checks and play start filtering Sam the scorebug visual Muse Voice Transcribe the captions you're reading we start with Madden where the data is next on the roadmap not built yet yet shooters like Call of Duty where the the same receipts could show the player's own stick drove the aim Core time doesn't prove who held the controller and it says so it does prove the score the the footage and the inputs belong to the same match that's verified skill core core time"
+   }
+  ]
+ }
+}

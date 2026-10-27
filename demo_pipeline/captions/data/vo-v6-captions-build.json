@@ -1,0 +1,14 @@
+{
+ "latency_s": 0.64,
+ "latency_fit_median_err_s": 0.146,
+ "partials": 302,
+ "asr_words": 359,
+ "script_words": 360,
+ "script_words_matched": 327,
+ "cues": 46,
+ "start_shift_vs_v5_s": {
+  "median": 0.07,
+  "mean_abs": 0.19,
+  "max_abs": 0.755
+ }
+}

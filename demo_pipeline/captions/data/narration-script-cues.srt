@@ -1,0 +1,183 @@
+1
+00:00:20,160 --> 00:00:21,470
+This is what proof looks like.
+
+2
+00:00:21,920 --> 00:00:25,571
+QorTime: anti-cheat and verified skill for console games — a signed
+
+3
+00:00:25,571 --> 00:00:29,003
+receipt tying the score, the footage, and the controller to one
+
+4
+00:00:29,003 --> 00:00:29,330
+match.
+
+5
+00:00:29,620 --> 00:00:32,682
+QorCap records the match from the capture card and logs the
+
+6
+00:00:32,682 --> 00:00:33,720
+controller over USB.
+
+7
+00:00:34,000 --> 00:00:36,610
+The referee signs a receipt, and anyone can check it in
+
+8
+00:00:36,610 --> 00:00:37,180
+the browser.
+
+9
+00:00:37,400 --> 00:00:40,363
+Open match one seven zero one two three, and the verifier
+
+10
+00:00:40,363 --> 00:00:42,390
+pins the trusted referee key by itself.
+
+11
+00:00:42,860 --> 00:00:45,310
+Verified. Away ten, home nothing.
+
+12
+00:00:45,580 --> 00:00:48,390
+Meta's Muse Spark explains that result in plain English.
+
+13
+00:00:48,580 --> 00:00:51,740
+It's signed with a separate advisory key, never the referee key.
+
+14
+00:00:52,000 --> 00:00:54,030
+Edit the explanation, and it disappears.
+
+15
+00:00:54,220 --> 00:00:55,380
+The verdict doesn't move.
+
+16
+00:00:55,620 --> 00:00:57,740
+Muse Spark is also the second score reader.
+
+17
+00:00:57,940 --> 00:01:01,310
+After every locked score, it re-reads the scorebug on its own.
+
+18
+00:01:01,520 --> 00:01:04,279
+On frames we never trained on, it got seventy three of
+
+19
+00:01:04,279 --> 00:01:06,680
+seventy three, and was never confidently wrong.
+
+20
+00:01:06,900 --> 00:01:08,280
+On this match, it agrees.
+
+21
+00:01:08,540 --> 00:01:11,280
+Now a test: a tampered claim of seven to nothing.
+
+22
+00:01:11,480 --> 00:01:14,600
+Muse reads three to nothing, and VERIFIED drops to PARTIAL.
+
+23
+00:01:14,800 --> 00:01:17,450
+It can lower a result, never raise one or fail it.
+
+24
+00:01:17,640 --> 00:01:20,640
+Tamper with the receipt itself, and the signature breaks. Fail.
+
+25
+00:01:21,080 --> 00:01:22,250
+About a cent per match.
+
+26
+00:01:22,500 --> 00:01:23,690
+This is Show Your Hands.
+
+27
+00:01:23,840 --> 00:01:26,380
+The overlay is the real controller log from this match.
+
+28
+00:01:26,580 --> 00:01:29,895
+Thirty one thousand reports, in four hundred seventy one chunks, each
+
+29
+00:01:29,895 --> 00:01:31,240
+one hashed into the receipt.
+
+30
+00:01:31,440 --> 00:01:34,670
+Press-to-pixel asks whether every play start has a press behind it.
+
+31
+00:01:34,860 --> 00:01:37,860
+Not enough evidence to score — so it scores nothing, instead
+
+32
+00:01:37,860 --> 00:01:39,260
+of flagging two legit plays.
+
+33
+00:01:39,550 --> 00:01:42,570
+Meta's SAM three point one draws the scorebug for viewers.
+
+34
+00:01:42,750 --> 00:01:45,292
+It missed on two of six frames, so it never touches
+
+35
+00:01:45,292 --> 00:01:45,790
+a verdict.
+
+36
+00:01:46,030 --> 00:01:50,320
+Muse Spark: explanations, score cross-checks, and play-start filtering.
+
+37
+00:01:50,510 --> 00:01:52,230
+SAM: the scorebug visual.
+
+38
+00:01:52,430 --> 00:01:54,880
+Muse Voice Transcribe: the captions you're reading.
+
+39
+00:01:55,110 --> 00:01:57,130
+We start with Madden, where the data is.
+
+40
+00:01:57,330 --> 00:02:00,061
+Next on the roadmap, not built yet: shooters like Call of
+
+41
+00:02:00,061 --> 00:02:03,079
+Duty, where the same receipts could show the player's own stick
+
+42
+00:02:03,079 --> 00:02:03,750
+drove the aim.
+
+43
+00:02:04,050 --> 00:02:07,060
+QorTime doesn't prove who held the controller, and it says so.
+
+44
+00:02:07,310 --> 00:02:10,199
+It does prove the score, the footage, and the inputs belong
+
+45
+00:02:10,199 --> 00:02:11,080
+to the same match.
+
+46
+00:02:11,250 --> 00:02:13,270
+That's verified skill. QorTime.
