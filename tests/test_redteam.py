@@ -39,7 +39,7 @@ def test_every_attack_rejected(report):
         assert r["outcome"] in ("rejected", "no_tamper_identical_to_honest"), r
         if r["outcome"] == "rejected":
             assert r["status"] != "VERIFIED" and r["reasons"], r
-    assert report["headline"] == f"{report['attacks_tested']} attacks · 0 accepted"
+    assert report["headline"] == f"Outside attacker: {report['attacks_tested']} attacks · 0 accepted"
 
 
 def test_harness_reproducible_with_fresh_keys(report):
@@ -120,3 +120,27 @@ def test_cli_writes_report(tmp_path):
     assert main(["--out", str(tmp_path)]) == 0
     rep = json.loads((tmp_path / "report.json").read_text(encoding="utf-8"))
     assert rep["accepted"] == 0 and (tmp_path / "summary.md").read_text(encoding="utf-8").startswith("# Red-Team")
+
+
+def test_insider_pass_reported_honestly(report):
+    rows = {r["id"]: r["insider"] for r in report["rows"]}
+    assert report["insider_tested"] >= 20 and report["insider_accepted"] == len(report["insider_accepted_ids"])
+    assert report["headline_insider"] == (f"Insider with signing keys: {report['insider_tested']} attacks · "
+                                          f"{report['insider_accepted']} accepted")
+    # A key holder can sign a score edit: expected, labelled, not hidden.
+    assert rows["score_edit_unsigned"]["accepted"] and rows["score_edit_unsigned"]["label"] == harness.INSIDER_ACCEPTED_LABEL
+    # Inner checks still stop these on their own, after the envelope is re-signed with the TEST keys.
+    expect = {"winner_flip_unsigned": "winner_inconsistent", "trust_tier_upgrade": "trust_tier_claim_wrong",
+              "score_type_confusion": "score_not_nonneg_int", "drop_first_checkpoint": "home:cp[*]:seq_gap",
+              "checkpoint_hash_edit": "home:cp[*]:hash_mismatch", "signal_laundering_delete": "away:motion_signal_missing",
+              "timestamp_shift_start": "away:cp[*]:gap_too_long", "drop_failed_challenge": ":challenge_missing:kickoff"}
+    for k, reason in expect.items():
+        assert not rows[k]["accepted"] and any(x.endswith(reason) for x in rows[k]["reasons"]), (k, rows[k])
+    for r in rows.values():
+        if r["accepted"]:
+            assert r["label"] == harness.INSIDER_ACCEPTED_LABEL and r["note"]
+
+
+def test_insider_sign_uses_only_test_keys(sb):
+    r = harness.insider_sign(sb, sb.receipt)
+    assert sb.verify(r)["status"] == "VERIFIED" and r["referee"]["pubkey"] == sb.referee.pubkey_hex
