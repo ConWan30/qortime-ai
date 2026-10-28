@@ -15,7 +15,7 @@ Muse Spark explains the result in plain English and re-reads every locked score,
 SAM 3.1 shows what the referee saw. The AI never decides a verdict. Its signals can only lower `VERIFIED` to `PARTIAL`,
 never raise a status, never fail a match. QorTime is not a coach and gives no play advice.
 
-[![pytest 350 passed, 5 skipped](https://img.shields.io/badge/pytest-350%20passed%20%C2%B7%205%20skipped-2ef2ff?labelColor=04050a&logo=pytest&logoColor=white)](#quick-start)
+[![pytest 389 passed, 5 skipped](https://img.shields.io/badge/pytest-389%20passed%20%C2%B7%205%20skipped-2ef2ff?labelColor=04050a&logo=pytest&logoColor=white)](#quick-start)
 [![npm test 182 checks](https://img.shields.io/badge/npm%20test-182%20checks-2ef2ff?labelColor=04050a&logo=nodedotjs&logoColor=white)](#quick-start)
 [![no API key needed](https://img.shields.io/badge/tests%20%26%20demo-no%20API%20key%20needed-2ef2ff?labelColor=04050a)](#for-judges-verify-in-2-minutes)
 [![license: PolyForm Noncommercial 1.0.0](https://img.shields.io/badge/license-PolyForm%20Noncommercial%201.0.0-2ef2ff?labelColor=04050a)](LICENSE)
@@ -87,6 +87,7 @@ This describes who it is built for. It is not a customer or partner list.
 [Built this week vs pre-existing](#built-this-week-vs-pre-existing) ·
 [Evidence Lens](#what-the-referee-saw-sam-31-evidence-lens--visualization-only) ·
 [Challenge Echo](#challenge-echo-sam-31--info-only-lower-only) ·
+[Stick Echo](#stick-echo-sam-31--info-only-lower-only) ·
 [Red-Team the Referee](#red-team-the-referee) ·
 [Quick start](#quick-start) ·
 [Repo layout](#repo-layout) ·
@@ -255,6 +256,7 @@ here.
 | Challenge Echo: SAM 3.1 tracks the pause-menu highlight; each logged D-pad press must be echoed on screen (latency, directions matched, menu after OPTIONS), `echo.sidecar.json` | `qortime_ai/echo/`, `web/echo-view.js`, `examples/practice-echo/` | SAM 3.1 | info only; a mismatch can at most lower VERIFIED → PARTIAL |
 | Agent verify API (built Oct 28 2026): public read-only `GET /agent/v1/matches`, `/matches/{id}`, `/verify?url=`, OpenAPI 3.1 spec written for AI agents, and a read-only MCP endpoint. Re-runs the pre-existing verifier against the pinned referee key and checks the public log; qortime.com URLs only | `qortime_ai/agent_api/`, `deploy/agent-api/`, `docs/AGENT_API.md` | — (no model) | none (reports the verifier's result; agents must only announce VERIFIED when `verified` is true) |
 | Commentary witness (built Oct 28 2026): offline, on recorded matches. Muse Voice Transcribe turns the broadcast commentary into speech segments; Muse Spark lists called scoring plays with a verbatim quote; code checks the quote, merges repeat calls, trusts times only to segment start/end, resolves teams only from match data (else unresolved), and matches each locked score by time window + points. Signed `commentary_witness.json` + match-page line "broadcast agrees / disagrees / unchecked". Tested on 170123's 3 public clips (3/3 agree, dev check); full-game false-call rate not yet measured | `qortime_ai/commentary/`, `web/commentary-witness-view.js`, `examples/170123/commentary_witness.json`, `docs/COMMENTARY_WITNESS.md` | Muse Voice Transcribe 1.0, Muse Spark 1.3 | info only; a disagreement can at most lower VERIFIED → PARTIAL; never runs in the live referee |
+| Stick Echo (built Oct 28 2026): SAM 3.1 tracks the player being controlled; its camera-compensated movement is scored against the logged left stick at a lag fixed beforehand from the game's pause challenges, against swapped-log nulls; totals-only `stickecho.sidecar.json` | `qortime_ai/stickecho/`, `examples/practice-stickecho/`, `docs/STICK_ECHO.md` | SAM 3.1 | info only; a clear disagreement can at most lower VERIFIED → PARTIAL |
 | README, docs and hero banners | `README.md`, `docs/`, sub-folder READMEs | — | — |
 
 File-by-file origin (qortime PR numbers): [`PROVENANCE.md`](PROVENANCE.md).
@@ -295,6 +297,25 @@ Practice run (10 pause challenges from one practice game; video and inputs kept 
 0 mismatch.** Median press-to-pixel per window 0.94–1.70 s, jitter inside a window ≤ 44 ms. Cost ≈ $0.31.
 Full write-up (matching rules, clock calibration, the two partial windows, CLI): [`docs/CHALLENGE_ECHO.md`](docs/CHALLENGE_ECHO.md).
 
+## Stick Echo (SAM 3.1) — info only, lower-only
+**Built Oct 28 2026, during the hackathon week.** Does the player being controlled move the way the logged left stick
+says, one fixed lag later? `qortime_ai/stickecho/` checks it: SAM 3.1 tracks the controlled player (box prompt
+seeded on the game's own controlled-player marker), deterministic code removes camera motion and scores the angle
+agreement against swapped-log nulls (the same video motion against stick timelines from other moments and other
+games). The lag is fixed beforehand from the same game's pause challenges (Challenge Echo).
+
+- **Effect:** `stickecho.sidecar.json` (`qortime.stickecho.v0`, integers only, totals only, next to the receipt;
+  `receipt.v0.json` untouched). `agree` ("controller and video agree") / `inconclusive` / `unscorable` add a note
+  only; `disagree` can suggest VERIFIED → PARTIAL and nothing else. It never raises a status or makes the call, and it
+  does not show who held the controller.
+- **Practice result** (two private offline practice games, never submitted; totals only): on the second game the
+  pre-registered method met its bar, z ≥ 3 against all three nulls (3.87 / 3.56 / 3.11, 543 frames). The first game
+  fell short (2.68 lowest, 222 frames). Exploratory changes made after seeing results (hybrid SAM + marker selection, a
+  movement response offset taken from the other game) reach 4.45 and 2.81; they are labelled exploratory, not the bar.
+- **Clock sync:** pause challenges spread across each game drift by at most 12–14 ms over the game.
+
+Full write-up (method, totals-only chart, clock check, limits, CLI): [`docs/STICK_ECHO.md`](docs/STICK_ECHO.md).
+
 ## Red-Team the Referee
 `python -m qortime_ai.redteam` →
 
@@ -316,7 +337,7 @@ Requires Python ≥ 3.10, Node ≥ 20, git. **No API key needed for tests or the
 ./scripts/fetch_upstream.sh            # pre-existing qortime @ 0e87ec3 -> upstream/ (git-ignored) + 170123 receipt
 python -m venv .venv && . .venv/bin/activate
 pip install -e '.[dev]'                # installs the pinned pre-existing qor-receipt library as a dependency
-pytest -q                              # 350 passed, 5 skipped (referee-hook integration tests live upstream)
+pytest -q                              # 389 passed, 5 skipped (referee-hook integration tests live upstream)
 npm test                               # 8 browser-module test files, 182 checks
 node web/demo-170123.mjs               # offline: verdict from verify.js, then the signed Muse files, lower-only
 python -m http.server 8000             # from the repo root; then open http://localhost:8000/web/demo.html
@@ -341,6 +362,7 @@ qortime_ai/hands/       Show Your Hands: input integrity, overlay track, press-t
 qortime_ai/redteam/     Red-Team the Referee: Muse Wonder attacks, harness, cited Spark explanations, wording filter
 qortime_ai/seen/        "What the referee saw" Evidence Lens: SAM 3.1 video tracking, captions, overlay render
 qortime_ai/echo/        Challenge Echo: SAM 3.1 pause-menu highlight track vs logged D-pad presses
+qortime_ai/stickecho/   Stick Echo: SAM 3.1 controlled-player track vs the logged left stick (info only, lower-only)
 qortime_ai/agent_api/   Agent verify API: read-only /agent/v1 endpoints, OpenAPI 3.1 spec, MCP endpoint (no model)
 web/                    browser panels, lower-only guard, auto-pin, advisory fetch, demo page, node tests
 tests/                  pytest suite (runs against the pinned pre-existing qortime checkout)
@@ -358,7 +380,7 @@ PROVENANCE.md           file-by-file origin, PR numbers, event-window dates
 | Model | Called from | Endpoint |
 |---|---|---|
 | Muse Spark 1.3 (`muse-spark-1.3`) | `qortime_ai/ai_ruling/muse.py`, `score_crosscheck.py`, `hands/muse_context.py`, `redteam/generate.py`, `seen/build.py`, `commentary/witness.py` | `/chat/completions` |
-| SAM 3.1 (`sam-3.1`) | `qortime_ai/ai_ruling/sam_scorebug.py`, `qortime_ai/seen/sam_video.py`, `qortime_ai/echo/video.py` | `/responses` |
+| SAM 3.1 (`sam-3.1`) | `qortime_ai/ai_ruling/sam_scorebug.py`, `qortime_ai/seen/sam_video.py`, `qortime_ai/echo/video.py`, `qortime_ai/stickecho/video.py` | `/responses` |
 | Muse Wonder 1.0 (`muse-wonder-1.0`) | `qortime_ai/redteam/generate.py` (one live run; output cached in `fixtures/wonder_attacks.json`) | `/chat/completions` |
 | Muse Voice Transcribe 1.0 (`muse-voice-transcribe-1.0`) | `demo_pipeline/captions/transcribe_stream.py`, `qortime_ai/commentary/asr.py` | `/asr/transcribe` |
 
