@@ -15,6 +15,8 @@ dependencies = ["qor-receipt @ git+https://github.com/ConWan30/qortime@0e87ec3be
 dev = ["pytest>=8", "fastapi>=0.110", "httpx>=0.27", "numpy>=1.26", "opencv-python-headless>=4.9", "meta-sam-parser==0.1.0", "requests>=2.31"]
 # Demo-video caption timing with Muse Voice Transcribe (demo_pipeline/captions/transcribe_stream.py)
 captions = ["requests>=2.31"]
+# Public read-only agent verify API (qortime_ai/agent_api, built Oct 28 2026)
+agent-api = ["fastapi>=0.110", "uvicorn>=0.29"]
 # "What the referee saw" overlay render (Pillow text) + Meta's SAM output parser
 seen = ["numpy>=1.26", "opencv-python-headless>=4.9", "meta-sam-parser==0.1.0", "pillow>=10"]
 
