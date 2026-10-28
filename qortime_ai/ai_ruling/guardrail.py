@@ -17,6 +17,10 @@ BANNED = [
     (re.compile(r"\bcoach", re.I), "coaching"),
     (re.compile(r"\bimprove your\b|\btips?\b(?! of)|\byou should (practice|play|try)\b", re.I), "coaching"),
     (re.compile(r"cheat[\s-]*free|guarantee", re.I), "overclaim"),
+    # Added Oct 28 2026 (in-window): no "proof of human play" claims and no "settle" language (agents record,
+    # announce or unlock on VERIFIED; they never settle anything).
+    (re.compile(r"\bproo?f\s+of\s+(a\s+)?human\s+play(?!er)|\bproves?\s+(that\s+)?a\s+human\s+played", re.I), "human_play_claim"),
+    (re.compile(r"\bsettl(e|es|ed|ing|ement|ements)\b", re.I), "settle_language"),
     (re.compile(r"\b(identity|who (was )?(holding|playing))\b[^.]{0,40}\b(confirmed|proven|verified)\b", re.I), "identity_claim"),
 ]
 
