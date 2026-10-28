@@ -18,7 +18,7 @@ never raise a status, never fail a match. QorTime is not a coach and gives no pl
 [![pytest 216 passed, 5 skipped](https://img.shields.io/badge/pytest-216%20passed%20%C2%B7%205%20skipped-2ef2ff?labelColor=04050a&logo=pytest&logoColor=white)](#quick-start)
 [![npm test 153 checks](https://img.shields.io/badge/npm%20test-153%20checks-2ef2ff?labelColor=04050a&logo=nodedotjs&logoColor=white)](#quick-start)
 [![no API key needed](https://img.shields.io/badge/tests%20%26%20demo-no%20API%20key%20needed-2ef2ff?labelColor=04050a)](#for-judges-verify-in-2-minutes)
-[![MIT license](https://img.shields.io/badge/license-MIT-2ef2ff?labelColor=04050a)](LICENSE)
+[![license: PolyForm Noncommercial 1.0.0](https://img.shields.io/badge/license-PolyForm%20Noncommercial%201.0.0-2ef2ff?labelColor=04050a)](LICENSE)
 <br>
 [![Meta models: Muse Spark, SAM 3.1, Muse Wonder, Voice Transcribe](https://img.shields.io/badge/Meta%20models-Muse%20Spark%20%C2%B7%20SAM%203.1%20%C2%B7%20Muse%20Wonder%20%C2%B7%20Voice%20Transcribe-4f7cff?labelColor=04050a&logo=meta&logoColor=white)](#where-meta-ai-is-used)
 [![Meta Global AI Developer Hackathon, Indie Developer track](https://img.shields.io/badge/Meta%20Global%20AI%20Developer%20Hackathon-Indie%20Developer%20track-4f7cff?labelColor=04050a)](#built-this-week-vs-pre-existing)
@@ -354,7 +354,12 @@ Built by **Contravious Battle**, solo founder, QorTime.
 
 ## License and credits
 
-[MIT](LICENSE). Copyright (c) 2026 Contravious Battle (ConWan30).
+Source-available under the [PolyForm Noncommercial License 1.0.0](LICENSE) (SPDX: `PolyForm-Noncommercial-1.0.0`).
+Copyright (c) 2026 Contravious Battle (ConWan30).
+
+- **Free for noncommercial use:** personal use, research, study, evaluation, and hackathon judging.
+- **Commercial use needs permission:** ask Con on GitHub at [github.com/ConWan30](https://github.com/ConWan30).
+- **Earlier versions:** versions published before this change were released under the MIT License and remain under MIT.
 
 - **Pre-existing, not in this repo:** the QorTime receipt format, referee and verifier this AI layer explains
   ([ConWan30/qortime@0e87ec3](https://github.com/ConWan30/qortime/commit/0e87ec3)), the QorCap capture client, and the
