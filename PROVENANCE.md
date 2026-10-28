@@ -32,6 +32,7 @@ upstream checkout; the panel CSS added to `verify/viewer.css` in #92/#93/#95 was
 | `demo_pipeline/captions/*` | submission demo pipeline (never in qortime) | Oct 26–27 |
 | `qortime_ai/redteam/*`, `tests/test_redteam.py`, `examples/redteam/*` | new in this repo (never in qortime); built Oct 27 2026, in the event window. The verifier it attacks is pre-existing and unmodified. Insider pass (re-sign with TEST keys) added Oct 27 2026, in-window | Oct 27– |
 | `qortime_ai/seen/*`, `tests/test_seen.py`, `web/seen-view.js`, `web/seen-view.test.mjs`, `examples/170123/seen.json`, `examples/170123/seen/*`; seen panel lines in `web/demo.html` and `web/advisory-panels.css` | new in this repo (never in qortime); built Oct 27 2026, in the event window. Inputs: QorCap's public 170123 highlight clips + the pre-existing receipt; SAM 3.1 + Muse Spark 1.3 outputs from Oct 27 2026 | Oct 27– |
+| `qortime_ai/echo/*`, `tests/test_echo.py`, `web/echo-view.js`, `web/echo.test.mjs`, `examples/practice-echo/echo.sidecar.json`; echo panel lines in `web/demo.html` and `web/advisory-panels.css` | new in this repo (never in qortime); built Oct 27 2026, in the event window. Inputs: a private practice game (video + inputs kept private, only per-press aggregates published); SAM 3.1 outputs from Oct 27 2026 | Oct 27– |
 
 ## Event-built edits to pre-existing qortime files (stay upstream, not copied here)
 Small hooks that wire the code above into the existing referee and verifier page:
