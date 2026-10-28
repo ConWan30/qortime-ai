@@ -16,7 +16,7 @@ A key qualifies only if it is:
 ## What it does not do
 - `verify.js` / `verifyReceipt()` are **unchanged**. Auto-pin only chooses the `refereePub` argument that a person
   could already type by hand. It never yields a result a manual pin of the same key would not.
-- Unknown, revoked, expired, local self-attested, referee-equals-player and malformed keys get **no pin**, so the
+- Unknown, revoked, expired, local self-signed, referee-equals-player and malformed keys get **no pin**, so the
   verifier call is exactly what it was before.
 - It never removes errors: a tampered receipt from a trusted referee still FAILs.
 - A key typed by the user (or filled from `?referee=`) always wins; auto-pin never runs then.

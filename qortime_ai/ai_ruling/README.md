@@ -1,7 +1,7 @@
 # `qortime_ai/ai_ruling/`: advisory receipt explainer (Muse Spark)
 
 > **Built during the Meta AI Developer Hackathon, Oct 26 – Nov 4 2026.** Everything in this folder is new hackathon
-> work. See [`HACKATHON.md`](../../HACKATHON.md) for pre-existing vs hackathon work.
+> work. See the [repo README](../../README.md#built-this-week-vs-pre-existing) and [`PROVENANCE.md`](../../PROVENANCE.md) for pre-existing vs hackathon work.
 
 Takes a QorTime receipt plus the referee/verifier results and writes a short plain-language explanation with
 Meta **Muse Spark** (`muse-spark-1.3`, Standard mode, via the Meta Model API).
@@ -23,7 +23,7 @@ No key, HTTP error, network error, timeout, malformed or empty answer, `finish_r
 The text is dropped if it:
 - does not state the verifier's status exactly (VERIFIED / PARTIAL / SELF-SIGNED / FAIL) or names any other status;
 - says a non-VERIFIED match "is verified";
-- uses "attested" or "hardware-verified" (device keys top out at `tpm_claimed`, which is an unverified claim);
+- overclaims device proof (the banned words in `qortime_ai/redteam/wording.py`; device keys top out at `tpm_claimed`, which is an unverified claim);
 - gives coaching or tips, says "cheat-free" or "guarantee", or claims who was holding the controller;
 - is longer than 1,500 characters.
 
@@ -31,7 +31,7 @@ The text is dropped if it:
 Only allowlisted facts (`facts_for`): status, game/platform/mode, the claimed result, verifier errors/partials,
 referee trust and delegation serial, review check states and details, the `not_proven` list, the controller-input
 advisory numbers, and the device-key status capped at `tpm_claimed`. **No** pubkeys, player ids, match ids, device
-instance paths or wall-clock times. The word "attested" is rewritten to "signed" before it reaches the model.
+instance paths or wall-clock times. Device-proof wording in the facts is rewritten to "signed" before it reaches the model.
 
 ## Use
 ```bash
@@ -45,7 +45,7 @@ v = verify_receipt(receipt, referee_pub=pub)    # the verdict
 res = explain(receipt, v)                       # advisory; res.ok False => show nothing extra
 ```
 Real Muse Spark output for match 170123 (pinned → VERIFIED, unpinned → PARTIAL):
-`docs/hackathon/ai_ruling_170123_*.example.json`. About 700 prompt / 350–600 completion tokens per call
+[`examples/170123/ai_ruling_170123_*.example.json`](../../examples/170123/). About 700 prompt / 350–600 completion tokens per call
 (~$0.003 at Standard prices).
 
 ## Tests
@@ -83,7 +83,7 @@ numbers with the locked score. Muse never sees the claimed score and never decid
 - **Muse unavailable** (no key, network/API error, truncated answer): every lock is `unchecked`, the summary says
   "Muse unchecked (local reader only, no penalty)" and the status is exactly what the verifier computed.
 - Cost: tracked per match (`cost_micro_usd`, `reads`). `max_reads` (default 12) bounds it; 170123 cost $0.0092
-  for 4 reads; the worst case at 12 reads is about $0.03, well under the $0.50/match target.
+  for 6 reads; the worst case at 12 reads is about $0.03, well under the $0.50/match target.
 - Output `score_crosscheck.json` (`qortime.score_crosscheck.v0`, `affects_verdict: "lower_only"`,
   `max_cap: "PARTIAL"`), signed with the AI advisory key and bound by `receipt_jcs_sha256`, like `ai_ruling.json`.
 - Verifier page: `web/score-crosscheck-view.js` checks signature, allowlist, binding and cap consistency. A valid

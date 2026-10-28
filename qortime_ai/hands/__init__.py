@@ -1,4 +1,4 @@
-"""Show Your Hands (Meta AI Developer Hackathon, Oct 26 - Nov 4 2026; hackathon work, see HACKATHON.md).
+"""Show Your Hands (Meta AI Developer Hackathon, Oct 26 - Nov 4 2026; hackathon work, see PROVENANCE.md).
 
 A verified DualSense input overlay for highlight clips, plus a press-to-pixel check that flags on-screen actions with
 no press behind them, sub-human reactions, or machine-regular timing.
