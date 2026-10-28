@@ -15,7 +15,7 @@ Muse Spark explains the result in plain English and re-reads every locked score,
 SAM 3.1 shows what the referee saw. The AI never decides a verdict. Its signals can only lower `VERIFIED` to `PARTIAL`,
 never raise a status, never fail a match. QorTime is not a coach and gives no play advice.
 
-[![pytest 216 passed, 5 skipped](https://img.shields.io/badge/pytest-216%20passed%20%C2%B7%205%20skipped-2ef2ff?labelColor=04050a&logo=pytest&logoColor=white)](#quick-start)
+[![pytest 251 passed, 5 skipped](https://img.shields.io/badge/pytest-251%20passed%20%C2%B7%205%20skipped-2ef2ff?labelColor=04050a&logo=pytest&logoColor=white)](#quick-start)
 [![npm test 153 checks](https://img.shields.io/badge/npm%20test-153%20checks-2ef2ff?labelColor=04050a&logo=nodedotjs&logoColor=white)](#quick-start)
 [![no API key needed](https://img.shields.io/badge/tests%20%26%20demo-no%20API%20key%20needed-2ef2ff?labelColor=04050a)](#for-judges-verify-in-2-minutes)
 [![license: PolyForm Noncommercial 1.0.0](https://img.shields.io/badge/license-PolyForm%20Noncommercial%201.0.0-2ef2ff?labelColor=04050a)](LICENSE)
@@ -68,7 +68,17 @@ shows up on the pause menu. Info only.
 </tr>
 </table>
 
+## Who benefits
+- **Players in money matches** who want a result both sides can check, instead of a screenshot and an argument.
+- **Tournament organizers and ladders** who have to resolve "that's not the real score" disputes and want a signed
+  receipt plus a plain-English explanation they can link.
+- **Platforms that resolve score disputes** and need a status they can re-check themselves, with the limits stated
+  next to it.
+
+This describes who it is built for. It is not a customer or partner list.
+
 ## Contents
+[Who benefits](#who-benefits) ·
 [For judges](#for-judges-verify-in-2-minutes) ·
 [Where Meta AI is used](#where-meta-ai-is-used) ·
 [How it works](#how-it-works) ·
@@ -140,7 +150,7 @@ verifier; every model output lands in a separate sidecar next to the receipt.
 | Meta model | What it does | Where in code | Effect on the verdict |
 |---|---|---|---|
 | **Muse Spark 1.3** | Writes the plain-English explanation of the referee's result. A deterministic guardrail rejects any text that misstates the status or makes banned claims; the result is signed with a separate AI advisory key | [`qortime_ai/ai_ruling/muse.py`](qortime_ai/ai_ruling/muse.py), [`explainer.py`](qortime_ai/ai_ruling/explainer.py), [`guardrail.py`](qortime_ai/ai_ruling/guardrail.py) | **None.** Fail-closed: no key, error or guardrail hit = no explanation |
-| **Muse Spark 1.3** | Second, independent reader of the scorebug at every locked score. On 170123: 2 of 2 checked locked scores agree (third: unsure → unchecked), ~$0.009 for 6 reads | [`qortime_ai/ai_ruling/score_crosscheck.py`](qortime_ai/ai_ruling/score_crosscheck.py) | **Lower only.** Agree = no change; disagree = VERIFIED → PARTIAL; unsure/unavailable = "Muse unchecked", no penalty |
+| **Muse Spark 1.3** | Second, independent reader of the scorebug at every locked score. On 170123: 2 of 2 checked locked scores agree (third: unsure → unchecked), ~$0.009 for 6 reads. Dev bench (not held out): 73/73 visible scores, see [`docs/SCORE_BENCH.md`](docs/SCORE_BENCH.md) | [`qortime_ai/ai_ruling/score_crosscheck.py`](qortime_ai/ai_ruling/score_crosscheck.py) | **Lower only.** Agree = no change; disagree = VERIFIED → PARTIAL; unsure/unavailable = "Muse unchecked", no penalty |
 | **Muse Spark 1.3** | Filters Show Your Hands play-start candidates | [`qortime_ai/hands/muse_context.py`](qortime_ai/hands/muse_context.py) | **Remove-only**; Show Your Hands is capped at PARTIAL |
 | **Muse Spark 1.3** | Cited captions (Evidence Lens) and red-team explanations: every sentence must cite a field, checked by code and a banned-word filter | [`qortime_ai/seen/build.py`](qortime_ai/seen/build.py), [`qortime_ai/redteam/generate.py`](qortime_ai/redteam/generate.py) | **None** |
 | **SAM 3.1** | Video-tracks the scorebug and players for the "What the referee saw" Evidence Lens | [`qortime_ai/seen/sam_video.py`](qortime_ai/seen/sam_video.py) | **None** (visualization, not a referee input) |
@@ -300,12 +310,12 @@ Requires Python ≥ 3.10, Node ≥ 20, git. **No API key needed for tests or the
 ./scripts/fetch_upstream.sh            # pre-existing qortime @ 0e87ec3 -> upstream/ (git-ignored) + 170123 receipt
 python -m venv .venv && . .venv/bin/activate
 pip install -e '.[dev]'                # installs the pinned pre-existing qor-receipt library as a dependency
-pytest -q                              # 216 passed, 5 skipped (referee-hook integration tests live upstream)
+pytest -q                              # 251 passed, 5 skipped (referee-hook integration tests live upstream)
 npm test                               # 7 browser-module test files, 153 checks
 node web/demo-170123.mjs               # offline: verdict from verify.js, then the signed Muse files, lower-only
 python -m http.server 8000             # from the repo root; then open http://localhost:8000/web/demo.html
 ```
-Counts re-checked Tue Oct 27 2026 (with Challenge Echo). Optional overlay render needs `pip install -e '.[seen]'` and
+Counts re-checked Wed Oct 28 2026 on a fresh clone (Python 3.13, Node 20). Optional overlay render needs `pip install -e '.[seen]'` and
 ffmpeg on PATH. `demo_pipeline/captions/transcribe_stream.py` needs `requests` (`pip install -e '.[captions]'`; also in `[dev]`).
 
 Live Muse Spark explanation (needs a Meta Model API key):
