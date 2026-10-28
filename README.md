@@ -308,6 +308,10 @@ seeded on the game's own controlled-player marker), deterministic code removes c
 agreement against swapped-log nulls (the same video motion against stick timelines from other moments and other
 games). The lag is fixed beforehand from the same game's pause challenges (Challenge Echo).
 
+- **Not player measurement.** SAM 3.1 here doesn't rate the player: it outputs no skill, speed, route or play-quality
+  numbers. It checks that the controlled player's on-screen movement follows the logged left stick one fixed lag later, scored
+  against swapped-log baselines. It is info only, can only lower VERIFIED to PARTIAL, and passed on two of three
+  private practice games.
 - **Effect:** `stickecho.sidecar.json` (`qortime.stickecho.v0`, integers only, totals only, next to the receipt;
   `receipt.v0.json` untouched). `agree` ("controller and video agree") / `inconclusive` / `unscorable` add a note
   only; `disagree` can suggest VERIFIED → PARTIAL and nothing else. It never raises a status or makes the call, and it
