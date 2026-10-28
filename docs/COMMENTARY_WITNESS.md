@@ -36,7 +36,7 @@ deterministic verifier. AI explains; it never decides.
 | Lock result | When |
 |---|---|
 | `agree` | a call in the window has the lock's points |
-| `disagree` | commentary is present in the window, nothing matches, and a high-confidence, keyword-backed call there names a different play (or a resolved team names the other side) |
+| `disagree` | commentary is present in the window, nothing matches, and a high-confidence, keyword-backed call there names a different play (or a resolved team names the other side), and that call does not fit a neighbouring lock |
 | `unchecked` | muted/absent commentary, no speech in the window, no call, only low-confidence calls, ASR or Muse failure, no key |
 
 Match line: **broadcast agrees** (no disagreeing lock, at least one agreeing), **broadcast disagrees** (any disagreeing
@@ -71,9 +71,46 @@ Voice Transcribe output also varies slightly between runs (e.g. "KC Concepcion" 
 Cost and time: 3 Voice Transcribe calls + 3 Muse Spark calls; Muse Spark ≈ $0.008 (tokens); Voice Transcribe price not
 recorded. About 21 s wall-clock for 36 s of audio (sequential; ASR alone measured 12.5–17.8 s per audio-minute).
 
+## Full games (Oct 28 2026): 170123 and 220105
+Each full match recording's audio track (private, not published) went through the merged module (PR #12). Locks come
+from QorCap's score timeline, moved onto the recording clock using the receipt's checkpoint span (about ±1 s; for
+170123 this matches the public clips' lock times within 0.6 s). 11 scoring plays in total.
+
+| Game | Audio | Speech found | Locks | Run 1 (PR #12 code) | Run 2 (after the fix below) |
+|---|---|---|---|---|---|
+| 170123 | 17.4 min | 128 segments, 514 s | FG, TD, XP | FG agree (low), TD agree, **XP: false disagreement** → "broadcast disagrees 1 of 3" | FG agree, TD agree, XP unchecked → **broadcast agrees 2 of 2** |
+| 220105 | 29.2 min | 34 segments, 180 s, nearly all in the first 7.5 min | 4 × (TD, XP) | TD agree, XP agree (low); 6 locks unchecked | same |
+
+Per scoring play (run 2): **4 hits, 1 miss, 6 unchecked, 0 false calls.**
+- **Miss (170123 XP):** the commentators said "for the extra point. The extra point." and "makes this a 10 point game",
+  but Muse Spark, reading the whole 128-segment game transcript in one request, listed no extra point. (On the 12 s
+  clip it did.) Not fixed: a change aimed at this one call would be tuning against the test game.
+- **False disagreement (run 1, 170123 XP):** the touchdown call 12 s before the extra-point lock fell inside the
+  extra-point lock's ±15 s window and counted as a conflicting call. **Fix (this is the one change):** a call that fits a
+  *neighbouring* lock (same side, in that lock's window, its points or part of a TD+XP/TD+2PT combo) never counts as a
+  conflict at this lock. A call that fits no lock still does. Re-scored from the cached run-1 transcript and Muse output,
+  no new model calls. Also: a call counts as `matched` only if it agreed with a lock (before, merely being near one was enough).
+- **Unchecked (220105, 6 locks):** Voice Transcribe found no speech after about 7.5 minutes except two fragments. A
+  check on 600–720 s returned an empty transcript although the audio level was like the earlier minutes (game sound
+  present). Commentary appears to stop; the cause is unknown (nobody listened to confirm). These count as unchecked, never
+  as disagreements, as designed.
+- **Calls with no matching score:** none. Near-score and recap lines were not called: "field goal range", "those
+  field goals are far from a certainty", "makes this a 10 point game", "seven nothing is our score as this kick is
+  sent into the air" (a kickoff). No replay produced a call, so no replay suppression was added.
+- **Runtime:** 170123 147 s wall (8.5 s per audio-minute; Voice Transcribe 143 s over 2 requests, Muse Spark 3.5 s);
+  220105 174 s (6.0 s per audio-minute; 4 requests, Muse Spark 2.8 s). Meta calls: 6 Voice Transcribe + 2 Muse Spark
+  (≈ $0.013 Muse tokens), plus 1 Voice Transcribe diagnostic request.
+
+Published sidecars (quotes only, no transcript, `quotes_only=True`):
+[`examples/170123/commentary_witness.full_game.json`](../examples/170123/commentary_witness.full_game.json),
+[`examples/220105/commentary_witness.full_game.json`](../examples/220105/commentary_witness.full_game.json). They keep
+segment counts and four short quoted score calls; no gamertags or player-entered names. Still not measured: games with
+replays of scoring plays, and how often a confident wrong call happens. Two games is not a rate.
+
 ## Data retention: unconfirmed
 Audio is sent to the Meta Model API's Voice Transcribe endpoint with `zdrOverride` left at the API default. Meta's data
-retention for this endpoint has **not been confirmed** for this project. Only already-public clips were sent.
+retention for this endpoint has **not been confirmed** for this project. The public clips and, on Oct 28 2026, the two
+full-game audio tracks (170123, 220105) were sent.
 
 ## Not claimed
 Not a referee input. It says nothing about who was playing or whether a person was playing at all. A broadcast call is commentary
@@ -88,5 +125,5 @@ python -m qortime_ai.commentary examples/170123/receipt.json --clips PATH/TO/qor
 # a full recording: locks.json = [{"id", "t_ms", "team": "away"|"home", "points"}] on the recording's timeline
 python -m qortime_ai.commentary RECEIPT --audio match.mp4 --locks locks.json --sign-key ADVISORY.key
 ```
-Full recordings (e.g. 170123 or 220105) need the original QorCap recording with its game-audio track and lock times on
-that recording's timeline. These live on the capture laptop, not in any public repo.
+Full recordings need the QorCap recording's game-audio track and lock times on that recording's timeline (private;
+use `--quotes-only` for any sidecar that will be published).
