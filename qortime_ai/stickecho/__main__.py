@@ -4,7 +4,7 @@
          [--no-sam | --yes-send-to-meta] [--max-calls 6] [--cache DIR] [--ledger FILE]
   python -m qortime_ai.stickecho score tracks.json inputs.jsonl --null-log OTHER.jsonl [--null-log ...]
          (--lag-ms N | --echo-sidecar echo.sidecar.json ...) [--video-start-us N] [--selection sam|hybrid|marker]
-         [--response-offset-ms N] [--receipt receipt.v0.json] [--out stickecho.sidecar.json]
+         [--response-offset-ms N] [--checks menu,switch] [--receipt receipt.v0.json] [--out stickecho.sidecar.json]
   python -m qortime_ai.stickecho check stickecho.sidecar.json
 
 ``track`` writes PRIVATE per-frame tracks (keep them local). SAM 3.1 needs META_API_KEY (never printed) and an
@@ -22,6 +22,7 @@ import sys
 from pathlib import Path
 from typing import Any
 
+from qortime_ai.stickecho import checks as CK
 from qortime_ai.stickecho import score as SC
 from qortime_ai.stickecho import select as SE
 from qortime_ai.stickecho import sidecar as S
@@ -89,15 +90,25 @@ def cmd_track(a) -> int:
 
 
 def run_score(tracks: dict[str, Any], log: StickLog, nulls: dict[str, StickLog], *, lag_s: float, selection: str,
-              response_offset_ms: int = 0, video_start_us: int | None = None) -> tuple[dict, dict, dict]:
+              response_offset_ms: int = 0, video_start_us: int | None = None,
+              checks: tuple[str, ...] = ()) -> tuple[dict, dict, dict]:
+    """``checks`` (EXPLORATORY, drop-only): see ``checks.py``. Counts go to ``src["checks"]``."""
     vsu = int(tracks.get("video_start_us") if video_start_us is None else video_start_us)
+    lag = lag_s + response_offset_ms / 1000
+    circle = log.press_times(CK.CIRCLE_BIT) if "switch" in checks else None
     wins, src = [], {"sam": 0, "marker": 0, "dropped": 0}
+    ck: dict[str, int] = {}
     for w in tracks["windows"]:
         V, s = SE.select(w, selection)
         for k in src:
             src[k] += s[k]
+        if checks:
+            V, c = CK.apply(w, V, checks, circle_t_us=circle, video_start_us=vsu, lag_s=lag_s)  # screen lag
+            for k, v in c.items():
+                ck[k] = ck.get(k, 0) + int(v)
         wins.append({"start_s": float(w["start_s"]), "V": V})
-    lag = lag_s + response_offset_ms / 1000
+    if checks:
+        src = {**src, "checks": ck}
     ev = SC.evaluate(wins, log, nulls, video_start_us=vsu, lag_s=lag)
     sweep = SC.lag_sweep(wins, log, video_start_us=vsu, lag_s=lag)
     return ev, src, sweep
@@ -119,11 +130,15 @@ def cmd_score(a) -> int:
         nulls[f"other_game_{i}"] = StickLog.from_path(p, f"other_game_{i}")
     if a.selection == "sam" and tracks.get("tracker") != "sam-3.1":
         raise SystemExit("selection 'sam' needs a SAM 3.1 tracks file")
+    checks = tuple(c for c in (a.checks or "").split(",") if c)
+    for c in checks:
+        if c not in CK.CHECKS:
+            raise SystemExit(f"--checks: unknown check {c!r} (choose from {', '.join(CK.CHECKS)})")
     ev, src, sweep = run_score(tracks, log, nulls, lag_s=lag_s, selection=a.selection,
-                               response_offset_ms=a.response_offset_ms, video_start_us=a.video_start_us)
+                               response_offset_ms=a.response_offset_ms, video_start_us=a.video_start_us, checks=checks)
     method = {"tracker": tracks.get("tracker"), "selection": a.selection, "lag_ms": round(lag_s * 1000),
-              "response_offset_ms": a.response_offset_ms,
-              "preregistered": a.selection == SE.PREREGISTERED and a.response_offset_ms == 0}
+              "response_offset_ms": a.response_offset_ms, "checks": list(checks),
+              "preregistered": a.selection == SE.PREREGISTERED and a.response_offset_ms == 0 and not checks}
     clock = {**clock, "video_start_us": int(tracks.get("video_start_us") if a.video_start_us is None else a.video_start_us),
              "rule": "stick sample at frame time minus the lag (input clock); lag fixed before scoring"}
     peak = max(sweep, key=sweep.get) if sweep else None
@@ -175,6 +190,8 @@ def main(argv: list[str] | None = None) -> int:
     s.add_argument("--selection", choices=SE.SELECTIONS, default=SE.PREREGISTERED)
     s.add_argument("--response-offset-ms", type=int, default=0,
                    help="EXPLORATORY: extra movement response time added to the Echo lag; must be fixed from other games")
+    s.add_argument("--checks", default="",
+                   help="EXPLORATORY drop-only free checks, comma list of: " + ",".join(CK.CHECKS))
     s.add_argument("--receipt", type=Path)
     s.add_argument("--out", type=Path)
     c = sub.add_parser("check")
