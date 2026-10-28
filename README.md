@@ -1,7 +1,7 @@
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/readme/hero-dark.svg">
   <source media="(prefers-color-scheme: light)" srcset="docs/readme/hero-light.svg">
-  <img alt="QorTime AI. Muse explains, it never decides. Meta Global AI Developer Hackathon, Indie track. Receipt and referee are pre-existing; explain (Muse Spark), attack (Muse Wonder) and see (SAM 3.1) were built this week." src="docs/readme/hero-dark.svg" width="1280" height="640">
+  <img alt="QorTime AI. Muse explains, it never decides. Meta Global AI Developer Hackathon, Indie track. Receipt and referee are pre-existing; explain (Muse Spark), attack (Muse Wonder) and see (SAM 3.1) were built this week." src="docs/readme/hero-dark.svg" width="1280">
 </picture>
 
 # QorTime AI
