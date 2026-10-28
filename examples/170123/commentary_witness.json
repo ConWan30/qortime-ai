@@ -1,0 +1,188 @@
+{
+ "schema": "qortime.commentary_witness.v0",
+ "label": "INFO ONLY, LOWER-ONLY. Meta Muse Voice Transcribe turns the game's broadcast commentary into text and Meta Muse Spark lists the scoring plays the commentators call. Each call is compared with the referee's locked scores: 'broadcast agrees', 'broadcast disagrees' or 'broadcast unchecked'. A disagreement can only lower VERIFIED to PARTIAL; it never raises a status and never fails a match. The referee decides; AI only explains.",
+ "built_during": "Meta AI Developer Hackathon, Oct 26 - Nov 4 2026 (built Oct 28 2026)",
+ "affects_verdict": "lower_only",
+ "max_cap": "PARTIAL",
+ "models": {
+  "asr": "muse-voice-transcribe-1.0",
+  "extractor": "muse-spark-1.3"
+ },
+ "data_retention": "Unconfirmed. Audio is sent to the Meta Model API (muse-voice-transcribe-1.0) with zdrOverride left at the API default; Meta's retention for this endpoint has not been confirmed for this project.",
+ "receipt_jcs_sha256": "a74ec73d41a66aad00f21e6922d7d2cebba2d887fede49b77a6097ee768b4bef",
+ "team_mapping": "unresolved (no team names in match data; never guessed)",
+ "sources": [
+  {
+   "id": "hl00-q3-a3-h0",
+   "sha256": "46e732640b65a1cdbf8e4f593713cfecea9abb1e6910dad55f070045d19ec70b",
+   "status": "ok",
+   "segments": [
+    {
+     "start_ms": 2700,
+     "end_ms": 11580,
+     "text": "And this kick is good. Get all of it there and he did something they couldn't do in the first half, partner. Get some"
+    }
+   ],
+   "max_volume_db": -22,
+   "dropped_calls": []
+  },
+  {
+   "id": "hl01-q4-a9-h0",
+   "sha256": "7355a9fb5c058aa8a546cef920c034706dd42f541eb11bb67b7e8da7d18a8680",
+   "status": "ok",
+   "segments": [
+    {
+     "start_ms": 460,
+     "end_ms": 2300,
+     "text": "The second down throw here for Watson."
+    },
+    {
+     "start_ms": 4780,
+     "end_ms": 10620,
+     "text": "And that is a catch at this game and seal this win touchdown. Casey Concepcion."
+    },
+    {
+     "start_ms": 10860,
+     "end_ms": 11580,
+     "text": "Touchdown."
+    }
+   ],
+   "max_volume_db": -22,
+   "dropped_calls": []
+  },
+  {
+   "id": "hl02-q4-a10-h0",
+   "sha256": "576e2b95c77d81c5715afa8e80761c4d4aa0486d3705cdf1f5eed2a149a9d14b",
+   "status": "ok",
+   "segments": [
+    {
+     "start_ms": 0,
+     "end_ms": 1020,
+     "text": "for the extra points."
+    },
+    {
+     "start_ms": 1500,
+     "end_ms": 1980,
+     "text": "Extra point."
+    },
+    {
+     "start_ms": 6540,
+     "end_ms": 11340,
+     "text": "Accuracy perfect there as inside caps. That makes this this a 10 point game."
+    }
+   ],
+   "max_volume_db": -22,
+   "dropped_calls": []
+  }
+ ],
+ "calls": [
+  {
+   "type": "FG",
+   "points": 3,
+   "start_ms": 2700,
+   "end_ms": 11580,
+   "confidence": "low",
+   "keyword_backed": false,
+   "source": "hl00-q3-a3-h0",
+   "team": "unresolved",
+   "quotes": [
+    "And this kick is good."
+   ],
+   "mentions": 1,
+   "id": "C1",
+   "matched": true
+  },
+  {
+   "type": "TD",
+   "points": 6,
+   "start_ms": 4780,
+   "end_ms": 11580,
+   "confidence": "high",
+   "keyword_backed": true,
+   "source": "hl01-q4-a9-h0",
+   "team": "unresolved",
+   "quotes": [
+    "touchdown.",
+    "Touchdown."
+   ],
+   "mentions": 2,
+   "id": "C2",
+   "matched": true
+  },
+  {
+   "type": "XP",
+   "points": 1,
+   "start_ms": 6540,
+   "end_ms": 11340,
+   "confidence": "low",
+   "keyword_backed": false,
+   "source": "hl02-q4-a10-h0",
+   "team": "unresolved",
+   "quotes": [
+    "Accuracy perfect there as inside caps."
+   ],
+   "mentions": 1,
+   "id": "C3",
+   "matched": true
+  }
+ ],
+ "locks": [
+  {
+   "id": "hl00-q3-a3-h0#lock306",
+   "source": "hl00-q3-a3-h0",
+   "t_ms": 8000,
+   "team": "away",
+   "points": 3,
+   "calls": [
+    "C1"
+   ],
+   "result": "agree"
+  },
+  {
+   "id": "hl01-q4-a9-h0#lock459",
+   "source": "hl01-q4-a9-h0",
+   "t_ms": 8000,
+   "team": "away",
+   "points": 6,
+   "calls": [
+    "C2"
+   ],
+   "result": "agree"
+  },
+  {
+   "id": "hl02-q4-a10-h0#lock467",
+   "source": "hl02-q4-a10-h0",
+   "t_ms": 8000,
+   "team": "away",
+   "points": 1,
+   "calls": [
+    "C3"
+   ],
+   "result": "agree"
+  }
+ ],
+ "unmatched_calls": [],
+ "checked": 3,
+ "agree": 3,
+ "disagree": 0,
+ "state": "agrees",
+ "cap": null,
+ "summary": "Broadcast agrees with 3 of 3 checked locked scores",
+ "api_calls": {
+  "asr": 3,
+  "muse": 3
+ },
+ "cost_micro_usd": 8428,
+ "cost_note": "Muse Spark tokens only; Voice Transcribe price not recorded",
+ "advisory_key": {
+  "pubkey": "a304fc22b5a7c426cbe24e33b9e7602fec39fc1d8dc5958e4cb5faa4ac38bd43",
+  "key_id": "2d5de84a3dcdeaec",
+  "key_kind": "qortime-ai-advisory",
+  "role": "advisory only; not a referee key; cannot make or change a verdict"
+ },
+ "advisory_signature": {
+  "alg": "Ed25519",
+  "key_id": "2d5de84a3dcdeaec",
+  "sig": "0f8a0d400db5b1109609f462006beff234954774d95180195df5b86933777fc11e1f2ece73b97d93e1e63b7cb7f819773b25ff59d5c77959c10354dc6848150f"
+ }
+}

@@ -14,6 +14,7 @@
  <p><button type="button" class="btn primary" id="go">Verify</button></p>
  <pre id="out" aria-live="polite"></pre>
  <div class="panels" id="xcSlot"></div>
+ <div class="panels" id="cwSlot"></div>
  <div class="panels" id="handsSlot"></div>
  <div class="panels" id="aiSlot"></div>
  <div class="panels" id="seenSlot"></div>
@@ -25,6 +26,7 @@ import { autoPinFor, AUTO_PIN_NOTE } from "./auto-pin.js";
 import { checkAiRuling, aiRulingPanel } from "./ai-ruling-view.js";
 import { checkCrosscheck, applyCrosscheck, crosscheckPanel } from "./score-crosscheck-view.js";
 import { checkHands, applyHands, handsPanel } from "./hands-view.js";
+import { checkWitness, applyWitness, witnessPanel } from "./commentary-witness-view.js";
 import { acceptLowerOnly } from "./lower-only.js";
 import { checkSeen, seenPanel } from "./seen-view.js";
 import { checkEcho, echoPanel } from "./echo-view.js";
@@ -43,9 +45,11 @@ async function check() {
   const v0 = await verifyReceipt(receiptDoc, pin);
   const xc = await checkCrosscheck(await getJson(base + "score_crosscheck.json"), receiptDoc);
   const hands = await checkHands(await getJson(base + "hands.json"), receiptDoc);
-  const v = acceptLowerOnly(v0, applyHands(applyCrosscheck(v0, xc), hands));
+  const cw = await checkWitness(await getJson(base + "commentary_witness.json"), receiptDoc);  // info only, lower-only (Oct 28 2026)
+  const v = acceptLowerOnly(v0, applyWitness(applyHands(applyCrosscheck(v0, xc), hands), cw));
   $("out").textContent = `verdict (verify.js): ${v0.status}\nshown after lower-only advisory signals: ${v.status}\n` + (auto && auto.pin ? AUTO_PIN_NOTE : "");
   $("xcSlot").replaceChildren(crosscheckPanel(xc));
+  $("cwSlot").replaceChildren(witnessPanel(cw));
   const hp = handsPanel(hands); $("handsSlot").replaceChildren(...(hp ? [hp] : []));
   const ai = await checkAiRuling(await getJson(base + "ai_ruling.json"), receiptDoc, v0.status);
   $("aiSlot").replaceChildren(...(ai.ok ? [aiRulingPanel(ai)] : []));

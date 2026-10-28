@@ -15,8 +15,8 @@ Muse Spark explains the result in plain English and re-reads every locked score,
 SAM 3.1 shows what the referee saw. The AI never decides a verdict. Its signals can only lower `VERIFIED` to `PARTIAL`,
 never raise a status, never fail a match. QorTime is not a coach and gives no play advice.
 
-[![pytest 298 passed, 5 skipped](https://img.shields.io/badge/pytest-298%20passed%20%C2%B7%205%20skipped-2ef2ff?labelColor=04050a&logo=pytest&logoColor=white)](#quick-start)
-[![npm test 153 checks](https://img.shields.io/badge/npm%20test-153%20checks-2ef2ff?labelColor=04050a&logo=nodedotjs&logoColor=white)](#quick-start)
+[![pytest 350 passed, 5 skipped](https://img.shields.io/badge/pytest-350%20passed%20%C2%B7%205%20skipped-2ef2ff?labelColor=04050a&logo=pytest&logoColor=white)](#quick-start)
+[![npm test 182 checks](https://img.shields.io/badge/npm%20test-182%20checks-2ef2ff?labelColor=04050a&logo=nodedotjs&logoColor=white)](#quick-start)
 [![no API key needed](https://img.shields.io/badge/tests%20%26%20demo-no%20API%20key%20needed-2ef2ff?labelColor=04050a)](#for-judges-verify-in-2-minutes)
 [![license: PolyForm Noncommercial 1.0.0](https://img.shields.io/badge/license-PolyForm%20Noncommercial%201.0.0-2ef2ff?labelColor=04050a)](LICENSE)
 <br>
@@ -158,6 +158,7 @@ verifier; every model output lands in a separate sidecar next to the receipt.
 | **SAM 3.1** | Tracks the pause-menu highlight for Challenge Echo | [`qortime_ai/echo/video.py`](qortime_ai/echo/video.py) | **Info only**; a mismatch can at most lower VERIFIED → PARTIAL |
 | **SAM 3.1** | Boxes the scorebug for viewers | [`qortime_ai/ai_ruling/sam_scorebug.py`](qortime_ai/ai_ruling/sam_scorebug.py) | **None** (info only; never a status signal) |
 | **Muse Wonder 1.0** | Red-team attacker: proposes receipt-tampering attacks as structured JSON mutations | [`qortime_ai/redteam/generate.py`](qortime_ai/redteam/generate.py) (one live run, cached in [`fixtures/wonder_attacks.json`](qortime_ai/redteam/fixtures/wonder_attacks.json)) | **None.** Attacks the verifier; never edits it |
+| **Muse Voice Transcribe 1.0** + **Muse Spark 1.3** | Commentary witness (built Oct 28 2026): transcribes a recorded match's broadcast commentary, Muse Spark lists the scoring plays the commentators call, code matches them to the referee's locked scores. On 170123's 3 public clips: 3 of 3 agree (dev check on the same clips, after one prompt revision; full-game false-call rate not yet measured). See [`docs/COMMENTARY_WITNESS.md`](docs/COMMENTARY_WITNESS.md) | [`qortime_ai/commentary/`](qortime_ai/commentary/) | **Info only, lower only.** Broadcast agrees = no change; disagrees = VERIFIED → PARTIAL; muted/absent commentary or ASR failure = "broadcast unchecked", no penalty |
 | **Muse Voice Transcribe 1.0** | Event-stream ASR of the demo narration; each partial's `audioProcessedMs` times the burned-in captions | [`demo_pipeline/captions/transcribe_stream.py`](demo_pipeline/captions/transcribe_stream.py), [`make_srt.py`](demo_pipeline/captions/make_srt.py) (reproduces `data/vo-v6-captions.srt` byte-for-byte) | n/a (video only) |
 
 Keys come only from the environment (`META_API_KEY`); nothing in this repo contains a key. No other Meta model
@@ -247,10 +248,11 @@ here.
 | Browser panels for the signed advisory files | `web/*-view.js`, `web/advisory-panels.css`, `web/demo.html`, `web/demo-170123.mjs` | — | display only |
 | Demo-video captions timed by ASR | `demo_pipeline/captions/` | Muse Voice Transcribe 1.0 | n/a (video only) |
 | Red-Team the Referee: Muse Wonder writes 26 receipt-tampering attacks (cached); the pre-existing verifier judges them against fresh TEST keys, as an outside attacker and as an insider holding the TEST signing keys; Muse Spark explanations must cite a field in every sentence, checked by code + banned-word filter | `qortime_ai/redteam/`, `examples/redteam/` | Muse Wonder 1.0, Muse Spark 1.3 | none (attacks the verifier; never edits it) |
-| Signed advisory files for match 170123 | `examples/170123/{ai_ruling,score_crosscheck,hands}.json` | Muse Spark 1.3 | — |
+| Signed advisory files for match 170123 | `examples/170123/{ai_ruling,score_crosscheck,hands,commentary_witness}.json` | Muse Spark 1.3, Muse Voice Transcribe 1.0 | — |
 | "What the referee saw" Evidence Lens: SAM 3.1 video-tracks the scorebug from the referee's own OCR region, motion split players / HUD / rest, `seen.v0` sidecar, cited Muse Spark captions, overlay render + web panel | `qortime_ai/seen/`, `web/seen-view.js`, `examples/170123/seen.json`, `examples/170123/seen/` | SAM 3.1, Muse Spark 1.3 | none (visualization, not a referee input) |
 | Challenge Echo: SAM 3.1 tracks the pause-menu highlight; each logged D-pad press must be echoed on screen (latency, directions matched, menu after OPTIONS), `echo.sidecar.json` | `qortime_ai/echo/`, `web/echo-view.js`, `examples/practice-echo/` | SAM 3.1 | info only; a mismatch can at most lower VERIFIED → PARTIAL |
 | Agent verify API (built Oct 28 2026): public read-only `GET /agent/v1/matches`, `/matches/{id}`, `/verify?url=`, OpenAPI 3.1 spec written for AI agents, and a read-only MCP endpoint. Re-runs the pre-existing verifier against the pinned referee key and checks the public log; qortime.com URLs only | `qortime_ai/agent_api/`, `deploy/agent-api/`, `docs/AGENT_API.md` | — (no model) | none (reports the verifier's result; agents must only announce VERIFIED when `verified` is true) |
+| Commentary witness (built Oct 28 2026): offline, on recorded matches. Muse Voice Transcribe turns the broadcast commentary into speech segments; Muse Spark lists called scoring plays with a verbatim quote; code checks the quote, merges repeat calls, trusts times only to segment start/end, resolves teams only from match data (else unresolved), and matches each locked score by time window + points. Signed `commentary_witness.json` + match-page line "broadcast agrees / disagrees / unchecked". Tested on 170123's 3 public clips (3/3 agree, dev check); full-game false-call rate not yet measured | `qortime_ai/commentary/`, `web/commentary-witness-view.js`, `examples/170123/commentary_witness.json`, `docs/COMMENTARY_WITNESS.md` | Muse Voice Transcribe 1.0, Muse Spark 1.3 | info only; a disagreement can at most lower VERIFIED → PARTIAL; never runs in the live referee |
 | README, docs and hero banners | `README.md`, `docs/`, sub-folder READMEs | — | — |
 
 File-by-file origin (qortime PR numbers): [`PROVENANCE.md`](PROVENANCE.md).
@@ -312,8 +314,8 @@ Requires Python ≥ 3.10, Node ≥ 20, git. **No API key needed for tests or the
 ./scripts/fetch_upstream.sh            # pre-existing qortime @ 0e87ec3 -> upstream/ (git-ignored) + 170123 receipt
 python -m venv .venv && . .venv/bin/activate
 pip install -e '.[dev]'                # installs the pinned pre-existing qor-receipt library as a dependency
-pytest -q                              # 298 passed, 5 skipped (referee-hook integration tests live upstream)
-npm test                               # 7 browser-module test files, 153 checks
+pytest -q                              # 350 passed, 5 skipped (referee-hook integration tests live upstream)
+npm test                               # 8 browser-module test files, 182 checks
 node web/demo-170123.mjs               # offline: verdict from verify.js, then the signed Muse files, lower-only
 python -m http.server 8000             # from the repo root; then open http://localhost:8000/web/demo.html
 ```
@@ -353,10 +355,10 @@ PROVENANCE.md           file-by-file origin, PR numbers, event-window dates
 
 | Model | Called from | Endpoint |
 |---|---|---|
-| Muse Spark 1.3 (`muse-spark-1.3`) | `qortime_ai/ai_ruling/muse.py`, `score_crosscheck.py`, `hands/muse_context.py`, `redteam/generate.py`, `seen/build.py` | `/chat/completions` |
+| Muse Spark 1.3 (`muse-spark-1.3`) | `qortime_ai/ai_ruling/muse.py`, `score_crosscheck.py`, `hands/muse_context.py`, `redteam/generate.py`, `seen/build.py`, `commentary/witness.py` | `/chat/completions` |
 | SAM 3.1 (`sam-3.1`) | `qortime_ai/ai_ruling/sam_scorebug.py`, `qortime_ai/seen/sam_video.py`, `qortime_ai/echo/video.py` | `/responses` |
 | Muse Wonder 1.0 (`muse-wonder-1.0`) | `qortime_ai/redteam/generate.py` (one live run; output cached in `fixtures/wonder_attacks.json`) | `/chat/completions` |
-| Muse Voice Transcribe 1.0 (`muse-voice-transcribe-1.0`) | `demo_pipeline/captions/transcribe_stream.py` | `/asr/transcribe` |
+| Muse Voice Transcribe 1.0 (`muse-voice-transcribe-1.0`) | `demo_pipeline/captions/transcribe_stream.py`, `qortime_ai/commentary/asr.py` | `/asr/transcribe` |
 
 No other Meta model (e.g. Muse Image) is used.
 
