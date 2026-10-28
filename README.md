@@ -68,6 +68,8 @@ shows up on the pause menu. Info only.
 </tr>
 </table>
 
+**Why this matters.** Today the only way a gamer can show they're good is to perform live, for hours, for whoever happens to be watching. Many creators say a 3-hour stream reaches a few hundred people, and they burn out before anyone notices them. QorTime moves the proof into the match itself. Every verified game produces a signed receipt and a public match page anyone can check, whether ten thousand people watched or nobody did. Where we're headed: a record of verified skill and play time that players build just by playing, which they can share, get ranked on, and eventually get paid for, without having to stream.
+
 ## Who benefits
 - **Players in money matches** who want a result both sides can check, instead of a screenshot and an argument.
 - **Tournament organizers and ladders** who have to resolve "that's not the real score" disputes and want a signed
