@@ -36,7 +36,10 @@ settings written down and hashed before the game was played.
 
 ![Stick Echo totals](stick-echo/totals.png)
 
-| Game | Method | Frames | Mean cosine | z vs same game / other game 1 / other game 2 | Status |
+In the sidecars, `other_game_1` and `other_game_2` are the controller logs of matches 170123 and 220105 (totals
+only; no per-frame data from either match is published).
+
+| Game | Method | Frames | Mean cosine | z vs same game / 170123 log / 220105 log | Status |
 |---|---|---|---|---|---|
 | A | `sam`, Echo lag (pre-registered) | 222 | 0.41 | 3.15 / 2.88 / 2.68 | below the bar (too few frames) |
 | **B** | **`sam`, Echo lag (pre-registered)** | **543** | **0.58** | **3.87 / 3.56 / 3.11** | **meets the bar** |
@@ -55,7 +58,7 @@ change is the bar until it is fixed in advance and checked on a new game.
 
 **Game C (Oct 28 2026).** The settings were written down and hashed before game C existed. They were the `sam`
 selection, the Echo lag plus a 250 ms response offset, and the free `menu` and `switch` checks. The nulls were this
-game plus the two earlier games. Game C meets the bar under those settings: 343 frames in 4 windows, lowest z 3.39.
+game plus the controller logs of matches 170123 and 220105, as for games A and B. Game C meets the bar under those settings: 343 frames in 4 windows, lowest z 3.39.
 The free checks dropped no frames. The original pre-registered method (no offset, no checks) scores 331 frames with
 lowest z 2.79, which is below the bar. Totals: [`examples/practice-stickecho/stickecho.game3-locked.sidecar.json`](../examples/practice-stickecho/stickecho.game3-locked.sidecar.json).
 That sidecar says `preregistered: false` because the offset and the checks were chosen after games A and B. They

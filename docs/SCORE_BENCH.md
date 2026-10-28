@@ -12,7 +12,9 @@ The demo video shows "73 of 73" for Muse Spark reading the scorebug. This page s
   were already used in earlier (pre-event) scorebug-reader evaluations. The prompt was written before this run and was
   not changed for it, but these frames are not unseen data in the held-out sense.
 - **We never trained or fine-tuned Muse.** Muse Spark 1.3 (`muse-spark-1.3`) is called as-is through the Meta Model
-  API. "Frames we never trained on" means only that: there was no training step on our side at all.
+  API. "Frames we never trained on" means only that: there was no training step on our side at all. The final
+  demo cut words it as "on frames it had never seen" and "73/73 on unseen frames"; read those the same way. Muse was
+  never trained or tuned on these frames, but they are a development bench, not a held-out set.
 - **It is not a match result.** On the live match 170123 the cross-check is "Muse Spark agrees with 2 of 2 checked
   locked scores" (the third lock was unsure, so unchecked). 73/73 is the bench; 2 of 2 is the match.
 - **It does not change what Muse is allowed to do.** The cross-check is lower-only: agreement keeps the status, a
