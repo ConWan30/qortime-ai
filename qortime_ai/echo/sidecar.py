@@ -32,7 +32,9 @@ def build(clips: list[dict[str, Any]], *, pattern: list[str], clock: dict[str, A
         "max_cap": PARTIAL, "emits_status": False, "receipt_jcs_sha256": receipt_jcs_sha256,
         "pattern": [p for p in pattern if p != "OPTIONS"], "clock": clock, "sam_role": SAM_ROLE,
         "menu_model": "vertical list: DOWN/UP move the highlight one row (with wrap); LEFT/RIGHT are no-ops "
-                      "(checked as 'highlight held still', marked visible=false)",
+                      "(checked as 'highlight held still', marked visible=false). A wrap is a jump above "
+                      f"{M.WRAP_PITCHES} row pitches, the pitch measured from the menu's text rows (per clip: "
+                      "menu_geometry; fallback 1/6 of the frame height when no pitch is measured)",
         "relay_gap_band_ms": [int(M.RELAY_GAP_BAND_S[0] * 1000), int(M.RELAY_GAP_BAND_S[1] * 1000)],
         "tolerances_ms": {"press_to_move": M.TOL_MS, "latency_bound": [M.LAT_MIN_MS, M.LAT_MAX_MS],
                           "menu_vs_dpad": list(M.MENU_VS_DPAD_MS)},

@@ -35,10 +35,13 @@ def run_clip(video: Path, records: list[dict[str, Any]], video_start_us: int, pa
     pr = [p for p in pr if p["t"] >= opt["t"]]
     end = next((p["t"] for p in pr if p["button"] == "CROSS"), opt["t"] + 20)
     obs = V.observe(video, opt["t"], end + M.LAT_MAX_MS / 1000 + 1.0, use_sam=use_sam, cache=cache, caller=caller)
-    moves = M.moves_from_track(obs.track, obs.size[1]) if obs.track else []
+    moves = M.moves_from_track(obs.track, obs.size[1], row_pitch=obs.row_pitch) if obs.track else []
     res = M.score_clip(pr, moves, obs.menu, pattern)
+    wrap_px, wrap_basis = M.wrap_threshold(obs.size[1], obs.row_pitch)
     out = {"id": clip_id, **res, "tracker": obs.tracker, "frame_step_ms": round(1000 / (V.SAM_FPS if obs.tracker ==
-           "sam-3.1" else obs.fps)), "highlight_moves_seen": len(moves)}
+           "sam-3.1" else obs.fps)), "highlight_moves_seen": len(moves),
+           "menu_geometry": {"row_pitch_px": round(obs.row_pitch) if obs.row_pitch else None,
+                             "wrap_threshold_px": round(wrap_px), "wrap_basis": wrap_basis}}
     if obs.fallback_agreement is not None:
         out["sam_vs_fallback_agreement_permille"] = round(obs.fallback_agreement * 1000)
     return out, obs.sam
