@@ -30,7 +30,7 @@ This repo holds **only work built during the event (Mon Oct 26 – Wed Nov 4, 20
 kept out; it is fetched at a pinned pre-event commit when you run or test this repo
 ([what's pre-existing](#built-this-week-vs-pre-existing)).
 
-> **Demo video (under 3 minutes):** `[DEMO VIDEO LINK — PLACEHOLDER: YouTube not uploaded yet]`. It opens with one line on what
+> **Demo video (under 3 minutes):** https://youtu.be/vlGJ1LXxumE. It opens with one line on what
 > was pre-existing and what was built this week.
 >
 > **Judges: verify it in 2 minutes** → [For judges](#for-judges-verify-in-2-minutes) · Two live VERIFIED matches:
