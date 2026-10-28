@@ -1,0 +1,79 @@
+{
+ "schema": "qortime.stickecho.v0",
+ "label": "INFO-ONLY, LOWER-ONLY. Stick Echo checks that the on-screen movement of the player being controlled follows the logged left stick. It never raises a status and never makes the call; a clear disagreement can only suggest lowering VERIFIED to PARTIAL. It does not show who held the controller.",
+ "built_during": "Meta AI Developer Hackathon, Oct 26 - Nov 4 2026 (built Oct 28 2026)",
+ "affects_verdict": "lower_only",
+ "max_cap": "PARTIAL",
+ "emits_status": false,
+ "receipt_jcs_sha256": null,
+ "sam_role": "Meta SAM 3.1 tracks the controlled player (box prompt seeded on the game's controlled-player marker, forward propagation). Marker detection, camera compensation, frame selection, the lag and the scoring are deterministic code.",
+ "method": {
+  "tracker": "sam-3.1",
+  "selection": "hybrid",
+  "lag_ms": 1432,
+  "response_offset_ms": 203,
+  "preregistered": false
+ },
+ "clock": {
+  "lag_source": "challenge_echo",
+  "echo_clips": 3,
+  "echo_spread_ms": 12,
+  "video_start_us": 2360000,
+  "rule": "stick sample at frame time minus the lag (input clock); lag fixed before scoring"
+ },
+ "rules": {
+  "min_frames": 300,
+  "agree_z_centi": 300,
+  "disagree_z_centi": 100,
+  "min_speed_milli_px_per_frame": 600,
+  "min_stick_permille": 350,
+  "null_draws": 5000
+ },
+ "not_published": "frames, crops, per-frame boxes and velocities, per-window values, raw controller timeline",
+ "totals": {
+  "windows": 6,
+  "frames_scored": 514,
+  "mean_cos_permille": 786,
+  "within_45_deg_permille": 813,
+  "frames_selected_by_source": {
+   "sam": 354,
+   "marker": 199,
+   "dropped": 106
+  }
+ },
+ "nulls": [
+  {
+   "source": "same_game",
+   "mean_permille": 46,
+   "sd_permille": 137,
+   "z_centi": 541,
+   "draws_ge_true_permille": 0
+  },
+  {
+   "source": "other_game_1",
+   "mean_permille": 29,
+   "sd_permille": 153,
+   "z_centi": 495,
+   "draws_ge_true_permille": 0
+  },
+  {
+   "source": "other_game_2",
+   "mean_permille": 57,
+   "sd_permille": 164,
+   "z_centi": 445,
+   "draws_ge_true_permille": 0
+  }
+ ],
+ "min_z_centi": 445,
+ "result": "agree",
+ "cap": null,
+ "diagnostics": {
+  "lag_sweep_peak_offset_ms": 100,
+  "note": "lag sweep is a diagnostic only; it never sets the lag"
+ },
+ "cost": {
+  "sam_frames": 702,
+  "sam_usd_est_micro": 140400
+ },
+ "summary": "controller and video agree: 514 frames in 6 window(s), mean cosine 786/1000, min z 4.45 over 3 null source(s); method hybrid (exploratory)."
+}
