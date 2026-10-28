@@ -1,4 +1,4 @@
-// node verify/advisory-fetch.test.mjs : verifier fallback to the referee's automatic advisory files (hackathon).
+// node web/advisory-fetch.test.mjs : verifier fallback to the referee's automatic advisory files (hackathon).
 import { readFileSync } from "node:fs";
 import { sha256Hex } from "../upstream/qortime/verify/verify.js";
 import { advisoryUrl, fetchAdvisoryText, isOfficialReview, refereeApi } from "./advisory-fetch.js";

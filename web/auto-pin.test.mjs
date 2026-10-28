@@ -1,4 +1,4 @@
-// node verify/auto-pin.test.mjs : verifier auto-pin (Meta AI Developer Hackathon, Oct 26 - Nov 4 2026; see verify/AUTO_PIN.md).
+// node web/auto-pin.test.mjs : verifier auto-pin (Meta AI Developer Hackathon, Oct 26 - Nov 4 2026; see web/AUTO_PIN.md).
 import { readFileSync } from "node:fs";
 import * as ed from "../upstream/qortime/verify/vendor/noble-ed25519.js";
 import { canonicalize, sha256Hex, verifyReceipt, loadAllowlist } from "../upstream/qortime/verify/verify.js";

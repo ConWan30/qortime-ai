@@ -1,4 +1,4 @@
-// node verify/hands.test.mjs : Show Your Hands panel (Meta AI Developer Hackathon; see HACKATHON.md).
+// node web/hands.test.mjs : Show Your Hands panel (Meta AI Developer Hackathon; see PROVENANCE.md).
 import { readFileSync } from "node:fs";
 import * as ed from "../upstream/qortime/verify/vendor/noble-ed25519.js";
 import { canonicalize, verifyReceipt } from "../upstream/qortime/verify/verify.js";

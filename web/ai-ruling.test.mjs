@@ -1,4 +1,4 @@
-// node verify/ai-ruling.test.mjs : advisory AI explanation panel checks (Meta AI Developer Hackathon; see HACKATHON.md).
+// node web/ai-ruling.test.mjs : advisory AI explanation panel checks (Meta AI Developer Hackathon; see PROVENANCE.md).
 import { readFileSync } from "node:fs";
 import * as ed from "../upstream/qortime/verify/vendor/noble-ed25519.js";
 import { canonicalize, sha256Hex, verifyReceipt } from "../upstream/qortime/verify/verify.js";
