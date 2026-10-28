@@ -21,7 +21,10 @@ Rules (tests: tests/test_commentary_witness.py):
   different play (or a resolved team says the other side). Anything else is ``unchecked``.
 * Muted or absent commentary, no speech in the window, ASR or Muse failure, no key: ``unchecked``, never ``disagree``.
 * Any disagreeing lock => ``cap: "PARTIAL"`` (VERIFIED -> PARTIAL on display). Nothing here raises a status or FAILs.
-* Calls with no lock nearby are listed as ``unmatched`` (information only; replays and recaps cause these).
+* A call that fits a NEIGHBOURING lock (the touchdown call 10-15 s before the extra-point lock) never counts as a
+  conflict at this lock. Added Oct 28 2026 after the first full-game run (doc: "Full games").
+* Calls that agree with no lock are listed as ``unmatched`` (information only; replays and recaps cause these).
+* ``quotes_only``: for private recordings the sidecar keeps only segment counts and short quoted score calls.
 * AI explains, never decides: the verdict is the pre-existing verifier's. Wording is checked by ``wording.py`` and
   ``guardrail.py`` banned-term lists plus a no-gambling-words rule; a quote that trips them is withheld.
 """
@@ -58,6 +61,7 @@ POINTS = {"TD": 6, "FG": 3, "XP": 1, "2PT": 2, "SAFETY": 2}
 COMBOS = {7: ("TD", "XP"), 8: ("TD", "2PT")}   # a scorebug lock can land after the try
 PRE_MS, POST_MS = 15_000, 15_000                # lock window: commentary usually calls the play before the scorebug moves
 MERGE_GAP_MS = 20_000
+MAX_QUOTE_CHARS = 80
 MUTED_MAX_DB = -50.0
 USD_IN, USD_OUT = 1.25e-6, 4.25e-6
 # A call can drive a DISAGREEMENT only if its own segment literally names the play (deterministic, not the model).
@@ -218,7 +222,19 @@ def _overlaps(c: dict, lo: int, hi: int) -> bool:
     return c["end_ms"] >= lo and c["start_ms"] <= hi
 
 
-def judge_lock(lock: dict[str, Any], calls: list[dict[str, Any]], segments: list[Segment]) -> dict[str, Any]:
+def _fits(c: dict[str, Any], lock: dict[str, Any]) -> bool:
+    """The call could be this lock's play: same source, in its window, right side, points equal or part of a combo."""
+    if c["source"] != lock["source"] or not _overlaps(c, lock["t_ms"] - PRE_MS, lock["t_ms"] + POST_MS):
+        return False
+    if c["team"] not in ("unresolved", lock.get("team")):
+        return False
+    return c["points"] == lock["points"] or c["type"] in COMBOS.get(lock["points"], ())
+
+
+def judge_lock(lock: dict[str, Any], calls: list[dict[str, Any]], segments: list[Segment],
+               explained: set[str] | None = None) -> dict[str, Any]:
+    """``explained`` = ids of calls that fit ANOTHER lock (e.g. the TD call 12 s before the extra-point lock). Such a
+    call is the neighbouring lock's play, so it never counts as a conflict here (added Oct 28 2026, see doc)."""
     t, pts, side = lock["t_ms"], lock["points"], lock.get("team")
     lo, hi = t - PRE_MS, t + POST_MS
     row = {"id": lock["id"], "source": lock["source"], "t_ms": t, "team": side, "points": pts, "calls": []}
@@ -229,8 +245,10 @@ def judge_lock(lock: dict[str, Any], calls: list[dict[str, Any]], segments: list
     same_side = [c for c in near if c["team"] in ("unresolved", side)]
     types = {c["type"] for c in same_side}
     if any(c["points"] == pts for c in same_side) or (pts in COMBOS and set(COMBOS[pts]) <= types):
+        row["agreeing_calls"] = [c["id"] for c in same_side if c["points"] == pts or c["type"] in COMBOS.get(pts, ())]
         return {**row, "result": "agree"}
-    conflict = [c for c in near if c["confidence"] == "high" and (c["team"] not in ("unresolved", side) or c["points"] != pts)]
+    conflict = [c for c in near if c["confidence"] == "high" and c["id"] not in (explained or set())
+                and (c["team"] not in ("unresolved", side) or c["points"] != pts)]
     if conflict:
         return {**row, "result": "disagree", "reason": "broadcast_calls_" + "+".join(sorted({c["type"] for c in conflict}))}
     return {**row, "result": "unchecked", "reason": "no_confident_call_in_window" if near else "no_call_in_window"}
@@ -240,9 +258,12 @@ def witness(receipt: dict[str, Any], sources: list[dict[str, Any]], locks: list[
             asr: VoiceTranscriber | None = None, extractor: CallExtractor | None = None,
             team_names: dict[str, list[str]] | None = None,
             probe_db: Callable[[str], float | None] | None = None,
-            to_wav: Callable[[str], bytes] | None = None) -> dict[str, Any]:
+            to_wav: Callable[[str], bytes] | None = None, quotes_only: bool = False) -> dict[str, Any]:
     """sources = [{"id", "path", "sha256"?}] (audio or video files); locks = [{"id", "source", "t_ms", "team", "points"}]
-    with t_ms on that source's timeline. Returns the unsigned sidecar. Never raises."""
+    with t_ms on that source's timeline. Returns the unsigned sidecar. Never raises.
+
+    ``quotes_only=True`` (for private recordings): the sidecar keeps segment counts and the short quoted score calls
+    only (each at most ``MAX_QUOTE_CHARS``), never the transcript."""
     asr = asr or VoiceTranscriber()
     extractor = extractor or CallExtractor()
     probe_db = probe_db or max_volume_db
@@ -286,13 +307,23 @@ def witness(receipt: dict[str, Any], sources: list[dict[str, Any]], locks: list[
     lock_rows = []
     for lk in locks:
         try:
-            lock_rows.append(judge_lock(lk, all_calls, segs_by_src.get(str(lk["source"]), [])))
+            others = [o for o in locks if o is not lk and isinstance(o, dict) and {"source", "t_ms", "points"} <= set(o)]
+            explained = {c["id"] for c in all_calls if any(_fits(c, o) for o in others)}
+            lock_rows.append(judge_lock(lk, all_calls, segs_by_src.get(str(lk["source"]), []), explained))
         except Exception as e:  # noqa: BLE001  a malformed lock is unchecked, never a disagreement
             lock_rows.append({"id": str((lk or {}).get("id")) if isinstance(lk, dict) else None, "result": "unchecked",
                               "reason": f"bad_lock:{type(e).__name__}", "calls": []})
-    matched = {cid for r in lock_rows for cid in r["calls"]}
+    # A call is "matched" only if it agreed with a lock; a call merely near a lock it doesn't fit is unmatched.
+    matched = {cid for r in lock_rows for cid in r.get("agreeing_calls", [])}
     for c in all_calls:
         c["matched"] = c["id"] in matched
+    if quotes_only:
+        for row in src_rows:
+            segs = row.pop("segments", [])
+            row["segments"] = {"count": len(segs), "speech_ms": sum(g["end_ms"] - g["start_ms"] for g in segs),
+                               "text": "not included (private recording; quoted score calls only)"}
+        for c in all_calls:
+            c["quotes"] = [q[:MAX_QUOTE_CHARS] for q in c["quotes"]]
     agree = sum(r["result"] == "agree" for r in lock_rows)
     dis = sum(r["result"] == "disagree" for r in lock_rows)
     if dis:
@@ -428,6 +459,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--pub")
     ap.add_argument("--sign-key", help="AI ADVISORY key file (never a referee key)")
     ap.add_argument("--out")
+    ap.add_argument("--quotes-only", action="store_true", help="keep only short quoted score calls, never the transcript")
     a = ap.parse_args(argv)
     receipt = json.loads(Path(a.receipt).read_text(encoding="utf-8"))
     if a.clips:
@@ -438,7 +470,7 @@ def main(argv: list[str] | None = None) -> int:
         sources = [{"id": "recording", "path": a.audio, "sha256": hashlib.sha256(Path(a.audio).read_bytes()).hexdigest()}]
         locks = [{**lk, "source": "recording"} for lk in json.loads(Path(a.locks).read_text(encoding="utf-8"))]
     names = team_names_from_match(json.loads(Path(a.match).read_text(encoding="utf-8"))) if a.match else None
-    doc = witness(receipt, sources, locks, team_names=names)
+    doc = witness(receipt, sources, locks, team_names=names, quotes_only=a.quotes_only)
     v = verify_receipt(receipt, referee_pub=a.pub)
     print(f"verifier: {v['status']}  ->  with commentary witness: {apply_to_result(v, doc)['status']}   "
           f"({doc['summary']}; ASR calls {doc['api_calls']['asr']}, Muse calls {doc['api_calls']['muse']}, "

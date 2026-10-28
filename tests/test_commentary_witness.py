@@ -5,6 +5,7 @@ import copy
 import io
 import itertools
 import json
+import re
 import urllib.request
 import wave
 from pathlib import Path
@@ -332,3 +333,50 @@ def test_long_audio_chunks_shift_segment_times():
 def test_verifier_and_referee_never_import_commentary():
     for p in [UP / "qor_receipt" / "receipt.py", UP / "verify" / "verify.js", ROOT / "qortime_ai" / "ai_ruling" / "auto.py"]:
         assert "commentary" not in p.read_text(encoding="utf-8")
+
+
+# ---- added Oct 28 2026 after the first full-game run (see docs/COMMENTARY_WITNESS.md "Full games") ---------------
+def test_td_call_never_conflicts_with_the_neighbouring_extra_point_lock():
+    turns = [[(899_600, 901_300, "touchdown, Cleveland"), (910_700, 916_900, "makes this a 10 point game")]]
+    doc, _, _ = run(turns, [[call(1, "TD", "touchdown, Cleveland")]], [lock(6, t_ms=896_600, i=2), lock(1, t_ms=911_400, i=3)])
+    assert [l["result"] for l in doc["locks"]] == ["agree", "unchecked"] and doc["cap"] is None
+    assert doc["unmatched_calls"] == []
+
+
+def test_conflict_not_explained_by_a_neighbour_still_disagrees():
+    turns = [[(899_600, 901_300, "and the field goal is good")]]
+    doc, _, _ = run(turns, [[call(1, "FG", "the field goal is good")]], [lock(6, t_ms=896_600, i=2), lock(1, t_ms=911_400, i=3)])
+    assert [l["result"] for l in doc["locks"]] == ["disagree", "disagree"] and doc["cap"] == "PARTIAL"
+    assert doc["unmatched_calls"] == ["C1"]
+
+
+def test_call_near_a_lock_it_does_not_fit_is_unmatched():
+    doc, _, _ = run([[(1000, 5000, "touchdown")]], [[call(1, "TD", "touchdown", "low")]], [lock(3)])
+    assert doc["locks"][0]["result"] == "unchecked" and doc["unmatched_calls"] == ["C1"]
+
+
+def test_quotes_only_drops_the_transcript():
+    long = "touchdown " + "and what a play that was by the whole offense today " * 4
+    fa, fm = FakeAsr([(1000, 9000, long), (9500, 12000, "crowd noise and talk")]), FakeMuse([call(1, "TD", long.strip())])
+    doc = W.witness(RECEIPT, [{"id": "s1", "path": "p"}], [lock(6, src="s1")], asr=A.VoiceTranscriber(api_key=SECRET, transport=fa),
+                    extractor=W.CallExtractor(api_key=SECRET, transport=fm), probe_db=lambda p: -20.0, to_wav=lambda p: wav(),
+                    quotes_only=True)
+    seg = doc["sources"][0]["segments"]
+    assert seg["count"] == 2 and seg["speech_ms"] == 10_500 and "crowd" not in json.dumps(doc)
+    assert all(len(q) <= W.MAX_QUOTE_CHARS for c in doc["calls"] for q in c["quotes"]) and doc["locks"][0]["result"] == "agree"
+
+
+FULL = [(MATCH / "commentary_witness.full_game.json", RECEIPT),
+        (ROOT / "examples" / "220105" / "commentary_witness.full_game.json",
+         json.loads((ROOT / "tests" / "fixtures" / "commentary" / "220105_receipt.json").read_text(encoding="utf-8")))]
+
+
+@pytest.mark.parametrize("path,receipt", FULL, ids=["170123", "220105"])
+def test_published_full_game_witnesses_are_quotes_only(path, receipt):
+    d = json.loads(path.read_text(encoding="utf-8"))
+    assert W.check_witness(d, receipt) == [] and d["cap"] is None and d["disagree"] == 0
+    for s in d["sources"]:
+        assert isinstance(s["segments"], dict) and set(s["segments"]) == {"count", "speech_ms", "text"}
+    quotes = [q for c in d["calls"] for q in c["quotes"]]
+    assert quotes and all(len(q) <= W.MAX_QUOTE_CHARS for q in quotes) and len(quotes) <= 10
+    assert all(re.search(r"touch|kick|goal|point", q, re.I) for q in quotes)  # score calls only

@@ -1,0 +1,135 @@
+{
+ "schema": "qortime.commentary_witness.v0",
+ "label": "INFO ONLY, LOWER-ONLY. Meta Muse Voice Transcribe turns the game's broadcast commentary into text and Meta Muse Spark lists the scoring plays the commentators call. Each call is compared with the referee's locked scores: 'broadcast agrees', 'broadcast disagrees' or 'broadcast unchecked'. A disagreement can only lower VERIFIED to PARTIAL; it never raises a status and never fails a match. The referee decides; AI only explains.",
+ "built_during": "Meta AI Developer Hackathon, Oct 26 - Nov 4 2026 (built Oct 28 2026)",
+ "affects_verdict": "lower_only",
+ "max_cap": "PARTIAL",
+ "models": {
+  "asr": "muse-voice-transcribe-1.0",
+  "extractor": "muse-spark-1.3"
+ },
+ "data_retention": "Unconfirmed. Audio is sent to the Meta Model API (muse-voice-transcribe-1.0) with zdrOverride left at the API default; Meta's retention for this endpoint has not been confirmed for this project.",
+ "receipt_jcs_sha256": "a74ec73d41a66aad00f21e6922d7d2cebba2d887fede49b77a6097ee768b4bef",
+ "team_mapping": "unresolved (no team names in match data; never guessed)",
+ "sources": [
+  {
+   "id": "recording",
+   "sha256": "0a238ada8c056e3bf00975abde5fad75711c3e112a95856685ed5daf1ba1a8d8",
+   "status": "ok",
+   "max_volume_db": -16,
+   "dropped_calls": [],
+   "segments": {
+    "count": 128,
+    "speech_ms": 514240,
+    "text": "not included (private recording; quoted score calls only)"
+   }
+  }
+ ],
+ "calls": [
+  {
+   "type": "FG",
+   "points": 3,
+   "start_ms": 590300,
+   "end_ms": 592540,
+   "confidence": "low",
+   "keyword_backed": false,
+   "source": "recording",
+   "team": "unresolved",
+   "quotes": [
+    "and this kick is good."
+   ],
+   "mentions": 1,
+   "id": "C1",
+   "matched": true
+  },
+  {
+   "type": "TD",
+   "points": 6,
+   "start_ms": 899580,
+   "end_ms": 901260,
+   "confidence": "high",
+   "keyword_backed": true,
+   "source": "recording",
+   "team": "unresolved",
+   "quotes": [
+    "touchdown, Cleveland"
+   ],
+   "mentions": 1,
+   "id": "C2",
+   "matched": true
+  }
+ ],
+ "locks": [
+  {
+   "id": "L1-q3-away+3",
+   "source": "recording",
+   "t_ms": 595855,
+   "team": "away",
+   "points": 3,
+   "calls": [
+    "C1"
+   ],
+   "agreeing_calls": [
+    "C1"
+   ],
+   "result": "agree"
+  },
+  {
+   "id": "L2-q4-away+6",
+   "source": "recording",
+   "t_ms": 896563,
+   "team": "away",
+   "points": 6,
+   "calls": [
+    "C2"
+   ],
+   "agreeing_calls": [
+    "C2"
+   ],
+   "result": "agree"
+  },
+  {
+   "id": "L3-q4-away+1",
+   "source": "recording",
+   "t_ms": 911434,
+   "team": "away",
+   "points": 1,
+   "calls": [
+    "C2"
+   ],
+   "result": "unchecked",
+   "reason": "no_confident_call_in_window"
+  }
+ ],
+ "unmatched_calls": [],
+ "checked": 2,
+ "agree": 2,
+ "disagree": 0,
+ "state": "agrees",
+ "cap": null,
+ "summary": "Broadcast agrees with 2 of 2 checked locked scores",
+ "api_calls": {
+  "asr": 2,
+  "muse": 1
+ },
+ "cost_micro_usd": 7788,
+ "cost_note": "Muse Spark tokens only; Voice Transcribe price not recorded",
+ "run": {
+  "recording": "full match video.mp4 audio track (private; not published)",
+  "date": "2026-10-28",
+  "wall_s_first_run": 147,
+  "rescored": "re-scored from the first run's cached transcript and Muse Spark output after the neighbouring-lock fix; no new model calls",
+  "timeline": "lock t_ms on the recording clock = QorCap score-timeline wall time minus recording start (from the receipt checkpoint span; about +/-1 s)"
+ },
+ "advisory_key": {
+  "pubkey": "a304fc22b5a7c426cbe24e33b9e7602fec39fc1d8dc5958e4cb5faa4ac38bd43",
+  "key_id": "2d5de84a3dcdeaec",
+  "key_kind": "qortime-ai-advisory",
+  "role": "advisory only; not a referee key; cannot make or change a verdict"
+ },
+ "advisory_signature": {
+  "alg": "Ed25519",
+  "key_id": "2d5de84a3dcdeaec",
+  "sig": "c5ab51f88c6497e63973ca40b17eff71a85cdcdabb98c198f7201f66df3f88dcd25bf07f5c30a65dec77ae327c39cdd40f6384398897c8d0d0d7bd4437139105"
+ }
+}
