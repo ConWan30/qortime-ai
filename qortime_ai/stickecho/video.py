@@ -22,6 +22,8 @@ from typing import Any
 
 import numpy as np
 
+from qortime_ai.stickecho.checks import screen_stats
+
 W, H, FPS = 640, 360, 30.0
 SEND_W, SEND_H = 960, 540
 MAX_CLIP_S = 10.0
@@ -299,7 +301,8 @@ def window_track(fr: list[np.ndarray], boxes: list | None, start_s: float, conte
     vm = field_velocity(fr, mfeet, mbox)
     out: dict[str, Any] = {"start_s": round(start_s, 4), "context": context, "score_from": int(score_from), "frames": n,
                            "marker": [None if m is None else [round(v, 2) for v in m] for m in mk],
-                           "marker_vel": [None if k not in vm else [float(x) for x in vm[k]] for k in range(n)]}
+                           "marker_vel": [None if k not in vm else [float(x) for x in vm[k]] for k in range(n)],
+                           "screen": [list(screen_stats(f)) for f in fr]}
     if boxes is not None:
         bx = (list(boxes) + [None] * n)[:n]
         vs = field_velocity(fr, [feet(b) for b in bx], bx)

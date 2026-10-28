@@ -65,8 +65,15 @@ def build(ev: dict[str, Any], *, method: dict[str, Any], sources: dict[str, int]
         "not_published": "frames, crops, per-frame boxes and velocities, per-window values, raw controller timeline",
         "totals": {"windows": ev["windows"], "frames_scored": ev["frames"],
                    "mean_cos_permille": _i(ev["mean_cos"], 1000), "within_45_deg_permille": _i(ev["within_45"], 1000),
-                   "frames_selected_by_source": {k: int(v) for k, v in sources.items()}},
+                   "frames_selected_by_source": {k: int(v) for k, v in sources.items() if k != "checks"}},
         "nulls": nulls, "min_z_centi": _i(ev.get("min_z"), 100), "result": result, "cap": decide_cap(result)}
+    if sources.get("checks") is not None:
+        c = sources["checks"]
+        doc["totals"]["free_checks"] = {
+            "rule": "drop-only: frames removed before scoring; never adds frames or raises a result",
+            "menu_frames_dropped": int(c.get("menu_dropped", 0)), "switch_frames_dropped": int(c.get("switch_dropped", 0)),
+            "circle_presses_on_defense": int(c.get("circle_presses_on_defense", 0)),
+            "circle_presses_without_marker_jump": int(c.get("circle_without_marker_jump", 0))}
     if diagnostics:
         doc["diagnostics"] = diagnostics
     if cost is not None:

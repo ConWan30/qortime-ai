@@ -15,6 +15,7 @@ the angle agreement against swapped-log nulls. The lag is fixed beforehand from 
 | `video.py` | controlled-player marker, SAM 3.1 seed boxes and call (cached), camera-compensated motion |
 | `select.py` | which motion counts per frame: `sam` (pre-registered), `hybrid` and `marker` (exploratory); never reads the stick |
 | `score.py` | angle cosine, swapped-log nulls, z, lag sweep (diagnostic only) |
+| `checks.py` | free local drop-only checks (exploratory): `menu` (play-call/menu screen) and `switch` (Circle on defense only) |
 | `sidecar.py` | `stickecho.sidecar.json` (`qortime.stickecho.v0`, integers only, totals only), lower-only cap |
 
 ```bash
@@ -24,8 +25,8 @@ META_API_KEY=... python -m qortime_ai.stickecho track VIDEO --video-start-us T0 
   --yes-send-to-meta --cache /private/cache --ledger spend.jsonl        # --no-sam = marker track only
 # 2) totals-only sidecar next to the receipt (lag from this game's Challenge Echo sidecars, fixed before scoring)
 python -m qortime_ai.stickecho score /private/tracks.json inputs.jsonl --null-log other_game/inputs.jsonl \
-  --echo-sidecar echo.sidecar.json --receipt receipt.v0.json
+  --echo-sidecar echo.sidecar.json --receipt receipt.v0.json     # + --checks menu,switch (exploratory, drop-only)
 python -m qortime_ai.stickecho check stickecho.sidecar.json
 ```
-Practice aggregates: [`examples/practice-stickecho/`](../../examples/practice-stickecho/). Tests: `tests/test_stickecho.py`.
+Practice aggregates: [`examples/practice-stickecho/`](../../examples/practice-stickecho/). Tests: `tests/test_stickecho.py`, `tests/test_stickecho_checks.py`.
 Full write-up: [`docs/STICK_ECHO.md`](../../docs/STICK_ECHO.md).

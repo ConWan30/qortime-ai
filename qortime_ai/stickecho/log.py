@@ -19,12 +19,13 @@ HALF_WINDOW_US = 50_000  # stick sample = mean over +-50 ms (reports arrive on c
 
 class StickLog:
     def __init__(self, records: Iterable[dict[str, Any]], name: str = "log"):
-        t, s = [], []
+        t, s, b = [], [], []
         for d in records:
             if d.get("type") != "in" or "lx" not in d:
                 continue
             t.append(int(d["t_us"]))
             s.append((d["lx"], d["ly"]))
+            b.append(int(d.get("b", 0)))
         if not t:
             raise ValueError(f"{name}: no left-stick records (lx/ly)")
         o = np.argsort(t, kind="stable")
@@ -32,6 +33,13 @@ class StickLog:
         self.T = np.asarray(t, np.int64)[o]
         self.S = (np.asarray(s, float)[o] - 127.5) / 127.5
         self.cs = np.vstack([[0.0, 0.0], np.cumsum(self.S, 0)])
+        self.B = np.asarray(b, np.int64)[o]
+
+    def press_times(self, bit: int) -> np.ndarray:
+        """Input-clock times (t_us) at which button ``bit`` goes from up to down. Used only to DROP frames."""
+        down = (self.B & bit) != 0
+        rise = down & ~np.concatenate([[False], down[:-1]])
+        return self.T[rise]
 
     @classmethod
     def from_path(cls, p: str | Path, name: str | None = None) -> "StickLog":
