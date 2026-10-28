@@ -1,6 +1,7 @@
 {
   "name": "qortime-ai-web",
   "private": true,
+  "license": "PolyForm-Noncommercial-1.0.0",
   "type": "module",
   "description": "Browser-side checks for QorTime's signed advisory files (event-built). Needs scripts/fetch_upstream.sh first.",
   "scripts": {
