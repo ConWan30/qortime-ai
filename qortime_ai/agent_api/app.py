@@ -44,10 +44,15 @@ class RateLimiter:
 
 
 def _client(request: Request) -> str:
-    xff = request.headers.get("x-forwarded-for", "")
+    """Client IP for rate limiting: the proxy-set X-Real-IP, else the right-most (proxy-appended) X-Forwarded-For
+    hop, so a client cannot dodge the limit by sending its own X-Forwarded-For."""
+    real = request.headers.get("x-real-ip", "").strip()
+    if real:
+        return real[:64]
+    xff = [h.strip() for h in request.headers.get("x-forwarded-for", "").split(",") if h.strip()]
     if xff:
-        return xff.split(",")[0].strip()[:64]
-    return request.headers.get("x-real-ip") or (request.client.host if request.client else "unknown")
+        return xff[-1][:64]
+    return request.client.host if request.client else "unknown"
 
 
 def create_app(svc: Service | None = None, *, rate: int | None = None, verify_rate: int | None = None) -> FastAPI:

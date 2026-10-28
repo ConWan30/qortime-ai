@@ -258,6 +258,14 @@ def test_rate_limited():
     assert r.status_code == 429 and int(r.headers["retry-after"]) >= 1
 
 
+def test_rate_limit_not_dodged_by_spoofed_forwarded_for():
+    fetch, _ = _site()
+    c = _client(Service(fetch=fetch), rate=2, verify_rate=2)
+    codes = [c.get("/agent/v1/matches", headers={"X-Forwarded-For": f"10.0.0.{i}, 203.0.113.9"}).status_code
+             for i in range(3)]
+    assert codes == [200, 200, 429]
+
+
 def test_cache_limits_upstream_calls():
     fetch, seen = _site()
     svc = Service(fetch=fetch)
