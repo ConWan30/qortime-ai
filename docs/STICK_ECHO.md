@@ -30,7 +30,7 @@ agree"**. That is all it says: it does not show who held the controller.
 
 ## Results on three private practice games (totals only)
 
-Both games were offline practice games, never submitted to the referee. Video and controller logs stay private; only
+All three games were offline practice games, never submitted to the referee. Video and controller logs stay private; only
 totals are published. Game A is the first test, game B the second; the bar was set before game B was scored. Game C was scored with
 settings written down and hashed before the game was played.
 
@@ -45,7 +45,7 @@ settings written down and hashed before the game was played.
 | A | `hybrid`, + response offset from game B | 191 | 0.55 | 3.07 / 3.01 / 2.81 | exploratory |
 | B | `hybrid`, + response offset from game A | 514 | 0.79 | 5.41 / 4.95 / 4.45 | exploratory |
 | **C** | **`sam`, Echo lag + 250 ms, `--checks menu,switch` (locked before the game)** | **343** | **0.56** | **3.56 / 3.49 / 3.39** | **meets the bar** |
-| C | `sam`, Echo lag (original pre-registered method, for continuity) | 331 | 0.56 | 2.96 / 2.88 / 2.79 | below the bar |
+| C | `sam`, Echo lag (original pre-registered method, for continuity) | 331 | 0.46 | 2.96 / 2.88 / 2.79 | below the bar |
 
 **Exploratory means tuned after seeing results.** `hybrid` was designed after game B's results showed SAM leaving
 the controlled player on small, far-away players. The response offset came from the lag sweeps: on both games,

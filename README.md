@@ -30,7 +30,7 @@ This repo holds **only work built during the event (Mon Oct 26 – Wed Nov 4, 20
 kept out; it is fetched at a pinned pre-event commit when you run or test this repo
 ([what's pre-existing](#built-this-week-vs-pre-existing)).
 
-> **Demo video (2:58):** `[DEMO VIDEO LINK — PLACEHOLDER: YouTube not uploaded yet]`. It opens with one line on what
+> **Demo video (under 3 minutes):** `[DEMO VIDEO LINK — PLACEHOLDER: YouTube not uploaded yet]`. It opens with one line on what
 > was pre-existing and what was built this week.
 >
 > **Judges: verify it in 2 minutes** → [For judges](#for-judges-verify-in-2-minutes) · Two live VERIFIED matches:
@@ -62,7 +62,7 @@ Red-Team the Referee: 26 Muse-written tampering attacks against the unmodified v
 **See** · SAM 3.1
 
 Evidence Lens tracks the scorebug from the referee's own OCR region. Challenge Echo checks every logged D-pad press
-shows up on the pause menu. Info only.
+shows up on the pause menu. Stick Echo checks the controlled player moves with the logged left stick. Info only.
 
 </td>
 </tr>
@@ -71,7 +71,7 @@ shows up on the pause menu. Info only.
 **Why this matters.** Today the only way a gamer can show they're good is to perform live, for hours, for whoever happens to be watching. Many creators say a 3-hour stream reaches a few hundred people, and they burn out before anyone notices them. QorTime moves the proof into the match itself. Every verified game produces a signed receipt and a public match page anyone can check, whether ten thousand people watched or nobody did. Where we're headed: a record of verified skill and play time that players build just by playing, which they can share, get ranked on, and eventually get paid for, without having to stream.
 
 ## Who benefits
-- **Players in money matches** who want a result both sides can check, instead of a screenshot and an argument.
+- **Players in competitive head-to-head matches** who want a result both sides can check, instead of a screenshot and an argument.
 - **Tournament organizers and ladders** who have to resolve "that's not the real score" disputes and want a signed
   receipt plus a plain-English explanation they can link.
 - **Platforms that resolve score disputes** and need a status they can re-check themselves, with the limits stated
@@ -159,10 +159,11 @@ verifier; every model output lands in a separate sidecar next to the receipt.
 | **Muse Spark 1.3** | Cited captions (Evidence Lens) and red-team explanations: every sentence must cite a field, checked by code and a banned-word filter | [`qortime_ai/seen/build.py`](qortime_ai/seen/build.py), [`qortime_ai/redteam/generate.py`](qortime_ai/redteam/generate.py) | **None** |
 | **SAM 3.1** | Video-tracks the scorebug and players for the "What the referee saw" Evidence Lens | [`qortime_ai/seen/sam_video.py`](qortime_ai/seen/sam_video.py) | **None** (visualization, not a referee input) |
 | **SAM 3.1** | Tracks the pause-menu highlight for Challenge Echo | [`qortime_ai/echo/video.py`](qortime_ai/echo/video.py) | **Info only**; a mismatch can at most lower VERIFIED → PARTIAL |
+| **SAM 3.1** | Tracks the controlled player for Stick Echo (box prompt seeded on the game's controlled-player marker) | [`qortime_ai/stickecho/video.py`](qortime_ai/stickecho/video.py) | **Info only**; a clear disagreement can at most lower VERIFIED → PARTIAL |
 | **SAM 3.1** | Boxes the scorebug for viewers | [`qortime_ai/ai_ruling/sam_scorebug.py`](qortime_ai/ai_ruling/sam_scorebug.py) | **None** (info only; never a status signal) |
 | **Muse Wonder 1.0** | Red-team attacker: proposes receipt-tampering attacks as structured JSON mutations | [`qortime_ai/redteam/generate.py`](qortime_ai/redteam/generate.py) (one live run, cached in [`fixtures/wonder_attacks.json`](qortime_ai/redteam/fixtures/wonder_attacks.json)) | **None.** Attacks the verifier; never edits it |
 | **Muse Voice Transcribe 1.0** + **Muse Spark 1.3** | Commentary witness (built Oct 28 2026): transcribes a recorded match's broadcast commentary, Muse Spark lists the scoring plays the commentators call, code matches them to the referee's locked scores. On 170123's 3 public clips: 3 of 3 agree (dev check on the same clips, after one prompt revision; full-game false-call rate not yet measured). See [`docs/COMMENTARY_WITNESS.md`](docs/COMMENTARY_WITNESS.md) | [`qortime_ai/commentary/`](qortime_ai/commentary/) | **Info only, lower only.** Broadcast agrees = no change; disagrees = VERIFIED → PARTIAL; muted/absent commentary or ASR failure = "broadcast unchecked", no penalty |
-| **Muse Voice Transcribe 1.0** | Event-stream ASR of the demo narration; each partial's `audioProcessedMs` times the burned-in captions | [`demo_pipeline/captions/transcribe_stream.py`](demo_pipeline/captions/transcribe_stream.py), [`make_srt.py`](demo_pipeline/captions/make_srt.py) (reproduces `data/vo-v6-captions.srt` byte-for-byte) | n/a (video only) |
+| **Muse Voice Transcribe 1.0** | Event-stream ASR of the demo narration; each partial's `audioProcessedMs` times the captions (v6 narration; later cuts were timed from the text-to-speech timestamps) | [`demo_pipeline/captions/transcribe_stream.py`](demo_pipeline/captions/transcribe_stream.py), [`make_srt.py`](demo_pipeline/captions/make_srt.py) (reproduces `data/vo-v6-captions.srt` byte-for-byte) | n/a (video only) |
 
 Keys come only from the environment (`META_API_KEY`); nothing in this repo contains a key. No other Meta model
 (e.g. Muse Image) is used. Model IDs and endpoints: [Models, services and open-source](#models-services-and-open-source-used).
@@ -181,8 +182,10 @@ flowchart LR
     X["Score cross-check<br/>Muse Spark 1.3"]
     H["Show Your Hands<br/>Muse Spark filter"]
     C["Challenge Echo<br/>SAM 3.1"]
+    K["Stick Echo<br/>SAM 3.1"]
+    M["Commentary witness<br/>Voice Transcribe + Spark"]
     L["Evidence Lens<br/>SAM 3.1 + Spark captions"]
-    E ~~~ X ~~~ H ~~~ C ~~~ L
+    E ~~~ X ~~~ H ~~~ C ~~~ K ~~~ M ~~~ L
   end
   W["Red-Team the Referee<br/>Muse Wonder 1.0"] -. "tampered receipts<br/>TEST keys" .-> V
   S --> WEEK
@@ -195,7 +198,7 @@ flowchart LR
   classDef week fill:#06262c,stroke:#2ef2ff,color:#e8feff
   classDef out fill:#0d1530,stroke:#4f7cff,color:#e6ecff
   class R,V,S pre
-  class E,X,H,C,L,W week
+  class E,X,H,C,K,M,L,W week
   class SC,G,SAME,PAR out
   style PRE fill:transparent,stroke:#7d8796,stroke-dasharray:4 4
   style WEEK fill:transparent,stroke:#2ef2ff
@@ -205,7 +208,7 @@ What the AI may do to a status:
 
 | Verifier status | After AI signals | Why |
 |---|---|---|
-| `VERIFIED` | `VERIFIED` or `PARTIAL` | A Muse Spark score disagreement, a Show Your Hands flag or a Challenge Echo mismatch can lower it, never further |
+| `VERIFIED` | `VERIFIED` or `PARTIAL` | A Muse Spark score disagreement, a Show Your Hands flag, a Challenge Echo mismatch, a Stick Echo disagreement or a broadcast-commentary disagreement can lower it, never further |
 | `PARTIAL` · `SELF-SIGNED` · `FAIL` | unchanged | The AI never raises a status and never fails a match |
 | any | unchanged if the sidecars are deleted or tampered with | Sidecars are checked (signature, allowlist, receipt binding); invalid = ignored. Tests check this |
 
@@ -228,8 +231,9 @@ Sun Oct 25 2026, and earlier), plus the whole capture client:
 
 This repo uses that code only as a **pinned dependency** (`pyproject.toml` → `qor-receipt @ git+…@0e87ec3`) and a
 **git-ignored checkout** (`scripts/fetch_upstream.sh` → `upstream/qortime/`, same commit). Nothing from it is committed
-here. The only pre-existing data used is the public receipt of match 170123, fetched from that checkout into
-`examples/170123/` (git-ignored).
+here. Pre-existing data used: the public receipt of match 170123, fetched from that checkout into
+`examples/170123/` (git-ignored), plus two public 170123 files committed as test fixtures (`match.json` and the
+highlight-clip `manifest.json`, both published on qortime.com before the event; listed in [`PROVENANCE.md`](PROVENANCE.md)).
 
 **The two verified matches.** Match 170123 and its page are pre-existing (signed Oct 23 2026). Match 220105 was
 played, uploaded and verified on Oct 27 2026, during the event. The live referee that reviewed it runs qortime code
@@ -308,10 +312,17 @@ games). The lag is fixed beforehand from the same game's pause challenges (Chall
   `receipt.v0.json` untouched). `agree` ("controller and video agree") / `inconclusive` / `unscorable` add a note
   only; `disagree` can suggest VERIFIED → PARTIAL and nothing else. It never raises a status or makes the call, and it
   does not show who held the controller.
-- **Practice result** (two private offline practice games, never submitted; totals only): on the second game the
-  pre-registered method met its bar, z ≥ 3 against all three nulls (3.87 / 3.56 / 3.11, 543 frames). The first game
-  fell short (2.68 lowest, 222 frames). Exploratory changes made after seeing results (hybrid SAM + marker selection, a
-  movement response offset taken from the other game) reach 4.45 and 2.81; they are labelled exploratory, not the bar.
+- **Practice results** (three private offline practice games, never submitted to the referee; totals only). The bar
+  is z ≥ 3 against every null:
+
+  | Game | Settings | Frames | z vs same game / other game 1 / other game 2 | Result |
+  |---|---|---|---|---|
+  | A (first test) | `sam`, Echo lag | 222 | 3.15 / 2.88 / 2.68 | below the bar |
+  | B | `sam`, Echo lag, **pre-registered before scoring** | 543 | **3.87 / 3.56 / 3.11** | controller and video agree |
+  | C | `sam`, Echo lag + 250 ms, `menu,switch` checks, **settings hashed before the game was played** | 343 | **3.56 / 3.49 / 3.39** | controller and video agree |
+
+  On game C the original game-B method (no offset, no checks) lands just under the bar (lowest z 2.79). Variants
+  tuned after seeing results (hybrid SAM + marker selection) are labelled exploratory, not the bar.
 - **Clock sync:** pause challenges spread across each game drift by at most 12–14 ms over the game.
 
 Full write-up (method, totals-only chart, clock check, limits, CLI): [`docs/STICK_ECHO.md`](docs/STICK_ECHO.md).
@@ -398,8 +409,9 @@ not in this repo: `qor-receipt` from [ConWan30/qortime@0e87ec3](https://github.c
 - Remotion: animated Meta-models / roadmap / "what this doesn't prove" section; headless Chrome: card stills; FFmpeg + x264: edit and encode
 - Sound effects and music: original, synthesized with NumPy for this video. (ElevenLabs sound effects were used only in
   early cuts and were all replaced; none are in the final video.)
-- Captions: timed with Muse Voice Transcribe (`demo_pipeline/captions/`; the committed data reproduces the v6 narration
-  captions — the final cut's extra beats were timed the same way)
+- Captions: `demo_pipeline/captions/` times captions from Muse Voice Transcribe event streams, and its committed data
+  reproduces the v6 narration captions byte-for-byte. The narration was re-recorded for later cuts; those cuts'
+  captions were timed from the text-to-speech timestamps
 
 ## Honesty rules and limits
 - **The verdict comes only from the deterministic verifier.** AI output lives in separate signed sidecars; deleting or
@@ -418,7 +430,9 @@ not in this repo: `qor-receipt` from [ConWan30/qortime@0e87ec3](https://github.c
   score, because the referee found no fourth-quarter scorebug at the end of the video. On 220105 the controller-timing
   advisory did not clear chance (`alignment_not_above_chance`, 435‰ vs 477‰). It is advisory only, but it is a real
   weak signal and we show it. Challenge Echo cannot score SQUARE presses and only checks that LEFT/RIGHT leave the
-  highlight still. Before PR #7 it misread a 5-row halftime menu wrap as a mismatch. On 170123, Show Your Hands
+  highlight still. Before PR #7 it misread a 5-row halftime menu wrap as a mismatch. Stick Echo has been run on three
+  private practice games from one player (one below the bar, two agree); that is not a measured accuracy, and game C
+  cleared the bar with 343 frames, close to the 300-frame minimum. On 170123, Show Your Hands
   press-to-pixel is *not scored* (clips could not be aligned), and SAM's still-frame scorebug locator found the
   scorebug on 4 of 6 frames, so it is never a status signal. The insider red-team pass found 5 inner-check gaps in the
   pre-existing verifier, reported and left unchanged. Device status is never above "TPM claimed (unverified)", and
