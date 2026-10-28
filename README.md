@@ -42,6 +42,7 @@ The only pre-existing data used is the public receipt of match 170123, fetched f
 | Red-Team the Referee: Muse Wonder writes 26 receipt-tampering attacks (cached), the pre-existing verifier judges them against fresh TEST keys, as an outside attacker and as an insider holding the TEST signing keys; Muse Spark explanations must cite a field in every sentence, checked by code + banned-word filter | `qortime_ai/redteam/`, `examples/redteam/` | Muse Wonder 1.0, Muse Spark 1.3 | none (attacks the verifier; never edits it) |
 | Signed advisory files for match 170123 | `examples/170123/{ai_ruling,score_crosscheck,hands}.json` | Muse Spark 1.3 | — |
 | "What the referee saw" Evidence Lens: SAM 3.1 video-tracks the scorebug from the referee's own OCR region, motion split players / HUD / rest, `seen.v0` sidecar, cited Muse Spark captions, overlay render + web panel (details below) | `qortime_ai/seen/`, `web/seen-view.js`, `examples/170123/seen.json`, `examples/170123/seen/` | SAM 3.1, Muse Spark 1.3 | none (visualization, not a referee input) |
+| Challenge Echo: SAM 3.1 tracks the pause-menu highlight; each logged D-pad press must be echoed on screen (latency, directions matched, menu after OPTIONS), `echo.sidecar.json` | `qortime_ai/echo/`, `web/echo-view.js`, `examples/practice-echo/` | SAM 3.1 | info only; a mismatch can at most lower VERIFIED → PARTIAL |
 
 File-by-file origin (qortime PR numbers): [`PROVENANCE.md`](PROVENANCE.md).
 
@@ -52,7 +53,7 @@ File-by-file origin (qortime PR numbers): [`PROVENANCE.md`](PROVENANCE.md).
   unsure/unavailable = "Muse unchecked", no penalty; (3) filters Show Your Hands play-start candidates (remove-only).
   On match 170123: 2 of 2 checked locked scores agree (third: unsure → unchecked), ~$0.009 for 6 reads.
 - **SAM 3.1** — boxes the scorebug for viewers, and video-tracks the scorebug + players for the "What the referee saw"
-  Evidence Lens (below). Info only; never a status signal.
+  Evidence Lens (below), and the pause-menu highlight for Challenge Echo. Info only; never a status signal.
 - **Muse Voice Transcribe 1.0** — event-stream ASR of the demo narration; each partial's `audioProcessedMs` times the
   burned-in captions (`demo_pipeline/captions/make_srt.py`, reproduces `data/vo-v6-captions.srt` byte-for-byte).
 - **Muse Wonder 1.0** — red-team attacker: proposes receipt tampering attacks as structured JSON mutations (see below).
@@ -98,6 +99,40 @@ tracking on QorCap's three **public** match-170123 highlight clips (12 s each):
 Sample: `examples/170123/seen/` (stills + the 3.2 MB hl01 overlay). Cost: SAM 3.1 6 × 360 frames ≈ $0.43; Spark captions
 ≈ $0.05. Paid steps: `python -m qortime_ai.seen.fetch` (SAM, outputs cached outside the repo) and `--spark`.
 
+## Challenge Echo (SAM 3.1) — info only, lower-only
+**Built Oct 27 2026, during the hackathon week.** During a pause challenge the player presses OPTIONS, enters the
+D-pad pattern on the pause menu, then selects Resume. `qortime_ai/echo/` checks that the **video follows the input
+log**: every logged D-pad press must be followed by the matching move of the pause-menu highlight.
+- **What SAM 3.1 does:** tracks the pause-menu highlight box. Only the menu window is sent, only the menu-list column
+  (left 30 % × top 47 % of the frame, nothing player-identifying), at 30 fps; a **box prompt** on the first menu frame
+  seeds one object and SAM propagates it forward. The track is the box's centre row.
+- **What is deterministic code (not SAM):** press edges from `inputs.jsonl`; finding the highlight box that seeds the
+  prompt; "menu appeared" (whole-frame luma goes dark after OPTIONS); the matching. A deterministic tracker (bright
+  rows of the highlight box) is the fallback when SAM is off or fails, and a cross-check: on the practice set SAM and
+  the fallback agree on 98–100 % of frames in 9 of 10 windows (72 % in the sloppy one, where a sub-menu opens).
+- **Matching:** DOWN/UP must move the highlight one row (wrap included) within ±100 ms of the window's common lag;
+  LEFT/RIGHT do nothing on this vertical menu, so Echo only checks the highlight held still (counted, marked
+  `visible: false`). Per press: press-to-pixel latency in ms. Per window: directions matched N of M, jitter, and
+  whether the menu appeared after the OPTIONS press. Latencies are reported against the known 0.5–2.4 s capture/relay gap.
+- **Effect:** `echo.sidecar.json` (schema `qortime.echo.v0`, integers only, next to the receipt; `receipt.v0.json` is
+  untouched). `consistent` / `partial` / `unscorable` add a note only; `mismatch` can suggest VERIFIED → PARTIAL and
+  nothing else (`qortime_ai/echo/sidecar.py`, tests). The browser panel (`web/echo-view.js`) is info-only and never
+  changes the status. The live referee and its challenge check are not changed.
+
+Practice run (10 pause challenges from one practice game, video and inputs kept private; aggregates in
+`examples/practice-echo/echo.sidecar.json`): **8 consistent, 2 partial, 0 mismatch.** Median press-to-pixel per window
+0.94–1.70 s, jitter inside a window ≤ 44 ms. The sloppy window (D-pad DOWN pressed six times, no LEFT/RIGHT/UP) comes out
+`partial`, 1/4 directions; its six DOWN presses all line up with six highlight moves. One other window is `partial`
+because the private extract has no release reports, so two quick DOWN presses read as one. The offset between the
+video and input clocks was calibrated from the OPTIONS → pause-menu latency (see the sidecar's `clock`); absolute
+latencies move with that offset, the jitter inside a window does not. The video also showed that the logged bit
+8192 is DOWN (not LEFT), as in `hands/track.py`. Cost: SAM 3.1, 1,571 frames ≈ $0.31 including one probe.
+```bash
+META_API_KEY=... python -m qortime_ai.echo VIDEO inputs.jsonl --video-start-us T0 --pattern LEFT,DOWN,RIGHT,UP \
+  --receipt receipt.v0.json --cache /private/cache --ledger spend.jsonl      # --no-sam = deterministic tracker only
+```
+Tests: `tests/test_echo.py` (synthetic presses, tracks and a drawn synthetic video), `web/echo.test.mjs`.
+
 ## Red-Team the Referee
 `python -m qortime_ai.redteam` → **Outside attacker: 25 attacks · 0 accepted** and
 **Insider with signing keys: 25 attacks · 12 accepted** (plus 1 pure replay that is byte-identical to an honest
@@ -130,12 +165,12 @@ Requires Python ≥ 3.10, Node ≥ 20, git. No API key needed for tests or the d
 ./scripts/fetch_upstream.sh            # pre-existing qortime @ 0e87ec3 -> upstream/ (git-ignored) + 170123 receipt
 python -m venv .venv && . .venv/bin/activate
 pip install -e '.[dev]'                # installs the pinned pre-existing qor-receipt library as a dependency
-pytest -q                              # 181 passed, 5 skipped (referee-hook integration tests live upstream)
-npm test                               # 6 browser-module test files, 142 checks
+pytest -q                              # 216 passed, 5 skipped (referee-hook integration tests live upstream)
+npm test                               # 7 browser-module test files, 153 checks
 node web/demo-170123.mjs               # offline: verdict from verify.js, then the signed Muse files, lower-only
 python -m http.server 8000             # from the repo root; then open http://localhost:8000/web/demo.html
 ```
-(Counts re-checked on a fresh clone of `3350e5c`, Tue Oct 27 2026.) Optional overlay render needs `pip install -e '.[seen]'`
+(Counts re-checked with Challenge Echo added, Tue Oct 27 2026.) Optional overlay render needs `pip install -e '.[seen]'`
 and ffmpeg on PATH. `demo_pipeline/captions/transcribe_stream.py` needs `requests` (`pip install -e '.[captions]'`; also in `[dev]`).
 Live Muse Spark explanation (needs a Meta Model API key):
 ```bash
@@ -150,7 +185,7 @@ small set of edits to pre-existing qortime files and stays in that repo (see `PR
 | Model | Called from | Endpoint |
 |---|---|---|
 | Muse Spark 1.3 (`muse-spark-1.3`) | `qortime_ai/ai_ruling/muse.py`, `score_crosscheck.py`, `hands/muse_context.py`, `redteam/generate.py`, `seen/build.py` | `/chat/completions` |
-| SAM 3.1 (`sam-3.1`) | `qortime_ai/ai_ruling/sam_scorebug.py`, `qortime_ai/seen/sam_video.py` | `/responses` |
+| SAM 3.1 (`sam-3.1`) | `qortime_ai/ai_ruling/sam_scorebug.py`, `qortime_ai/seen/sam_video.py`, `qortime_ai/echo/video.py` | `/responses` |
 | Muse Wonder 1.0 (`muse-wonder-1.0`) | `qortime_ai/redteam/generate.py` (one live run; output cached in `fixtures/wonder_attacks.json`) | `/chat/completions` |
 | Muse Voice Transcribe 1.0 (`muse-voice-transcribe-1.0`) | `demo_pipeline/captions/transcribe_stream.py` | `/asr/transcribe` |
 No other Meta model (e.g. Muse Image) is used.

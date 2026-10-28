@@ -1,0 +1,592 @@
+{
+ "schema": "qortime.echo.v0",
+ "label": "INFO-ONLY, LOWER-ONLY. Challenge Echo checks that the video's pause-menu highlight follows the logged D-pad presses. It never raises a status; a mismatch can only suggest lowering VERIFIED to PARTIAL. AI explains, it never decides; the referee's own challenge check is unchanged.",
+ "built_during": "Meta AI Developer Hackathon, Oct 26 - Nov 4 2026 (built Oct 27 2026)",
+ "affects_verdict": "lower_only",
+ "max_cap": "PARTIAL",
+ "emits_status": false,
+ "receipt_jcs_sha256": null,
+ "pattern": [
+  "LEFT",
+  "DOWN",
+  "RIGHT",
+  "UP"
+ ],
+ "clock": {
+  "video_start_source": "practice clips: input-clock start = challenge time - 6 s + calibrated offset",
+  "calibrated_offset_ms": 2360,
+  "calibration": "video t=0 sits 2360 ms after input t=0. Set so the median OPTIONS -> dark pause menu latency over the 10 windows is 1625 ms, the middle of the 1.5-1.75 s the pre-existing referee docs measured for Madden/PS5 capture. The raw segment estimate (first manifest segment) gave about 1914 ms. Absolute latencies move with this offset; the per-press jitter inside a window does not.",
+  "release_rule": "private extract keeps only non-zero reports: a gap > 120 ms between reports carrying a bit = release"
+ },
+ "sam_role": "Meta SAM 3.1 tracks the pause-menu highlight box (box prompt on the first menu frame, forward propagation). Menu detection, press edges and the matching are deterministic code.",
+ "menu_model": "vertical list: DOWN/UP move the highlight one row (with wrap); LEFT/RIGHT are no-ops (checked as 'highlight held still', marked visible=false)",
+ "relay_gap_band_ms": [
+  500,
+  2400
+ ],
+ "tolerances_ms": {
+  "press_to_move": 100,
+  "latency_bound": [
+   0,
+   2500
+  ],
+  "menu_vs_dpad": [
+   -150,
+   1000
+  ]
+ },
+ "not_published": "frames, crops, per-frame boxes, raw controller timeline",
+ "clips": [
+  {
+   "id": "p01",
+   "status": "consistent",
+   "why": null,
+   "presses": [
+    {
+     "button": "LEFT",
+     "visible": false,
+     "echoed": true,
+     "latency_ms": null
+    },
+    {
+     "button": "DOWN",
+     "visible": true,
+     "echoed": true,
+     "latency_ms": 1252,
+     "wrap": false
+    },
+    {
+     "button": "RIGHT",
+     "visible": false,
+     "echoed": true,
+     "latency_ms": null
+    },
+    {
+     "button": "UP",
+     "visible": true,
+     "echoed": true,
+     "latency_ms": 1208,
+     "wrap": false
+    }
+   ],
+   "directions_matched": 4,
+   "directions_total": 4,
+   "presses_echoed": 4,
+   "presses_logged": 4,
+   "unexplained_moves": 0,
+   "lag_ms": 1230,
+   "jitter_ms": 22,
+   "menu": {
+    "appeared": true,
+    "latency_ms": 1518,
+    "vs_dpad_ms": 288
+   },
+   "logged_order_matches_pattern": true,
+   "latency_median_ms": 1230,
+   "in_relay_gap_band": true,
+   "tracker": "sam-3.1",
+   "frame_step_ms": 33,
+   "highlight_moves_seen": 2,
+   "sam_vs_fallback_agreement_permille": 1000
+  },
+  {
+   "id": "p02",
+   "status": "consistent",
+   "why": null,
+   "presses": [
+    {
+     "button": "LEFT",
+     "visible": false,
+     "echoed": true,
+     "latency_ms": null
+    },
+    {
+     "button": "DOWN",
+     "visible": true,
+     "echoed": true,
+     "latency_ms": 1098,
+     "wrap": false
+    },
+    {
+     "button": "RIGHT",
+     "visible": false,
+     "echoed": true,
+     "latency_ms": null
+    },
+    {
+     "button": "UP",
+     "visible": true,
+     "echoed": true,
+     "latency_ms": 1125,
+     "wrap": false
+    }
+   ],
+   "directions_matched": 4,
+   "directions_total": 4,
+   "presses_echoed": 4,
+   "presses_logged": 4,
+   "unexplained_moves": 0,
+   "lag_ms": 1111,
+   "jitter_ms": 14,
+   "menu": {
+    "appeared": true,
+    "latency_ms": 1501,
+    "vs_dpad_ms": 389
+   },
+   "logged_order_matches_pattern": true,
+   "latency_median_ms": 1112,
+   "in_relay_gap_band": true,
+   "tracker": "sam-3.1",
+   "frame_step_ms": 33,
+   "highlight_moves_seen": 2,
+   "sam_vs_fallback_agreement_permille": 1000
+  },
+  {
+   "id": "p03",
+   "status": "consistent",
+   "why": null,
+   "presses": [
+    {
+     "button": "LEFT",
+     "visible": false,
+     "echoed": true,
+     "latency_ms": null
+    },
+    {
+     "button": "DOWN",
+     "visible": true,
+     "echoed": true,
+     "latency_ms": 926,
+     "wrap": false
+    },
+    {
+     "button": "RIGHT",
+     "visible": false,
+     "echoed": true,
+     "latency_ms": null
+    },
+    {
+     "button": "UP",
+     "visible": true,
+     "echoed": true,
+     "latency_ms": 955,
+     "wrap": false
+    }
+   ],
+   "directions_matched": 4,
+   "directions_total": 4,
+   "presses_echoed": 4,
+   "presses_logged": 4,
+   "unexplained_moves": 0,
+   "lag_ms": 940,
+   "jitter_ms": 15,
+   "menu": {
+    "appeared": true,
+    "latency_ms": 1303,
+    "vs_dpad_ms": 362
+   },
+   "logged_order_matches_pattern": true,
+   "latency_median_ms": 940,
+   "in_relay_gap_band": true,
+   "tracker": "sam-3.1",
+   "frame_step_ms": 33,
+   "highlight_moves_seen": 2,
+   "sam_vs_fallback_agreement_permille": 1000
+  },
+  {
+   "id": "p04",
+   "status": "partial",
+   "why": "pattern_directions_missing",
+   "presses": [
+    {
+     "button": "DOWN",
+     "visible": true,
+     "echoed": true,
+     "latency_ms": 1601,
+     "wrap": false
+    },
+    {
+     "button": "DOWN",
+     "visible": true,
+     "echoed": true,
+     "latency_ms": 1601,
+     "wrap": false
+    },
+    {
+     "button": "DOWN",
+     "visible": true,
+     "echoed": true,
+     "latency_ms": 1593,
+     "wrap": false
+    },
+    {
+     "button": "DOWN",
+     "visible": true,
+     "echoed": true,
+     "latency_ms": 1621,
+     "wrap": false
+    },
+    {
+     "button": "DOWN",
+     "visible": true,
+     "echoed": true,
+     "latency_ms": 1638,
+     "wrap": false
+    },
+    {
+     "button": "DOWN",
+     "visible": true,
+     "echoed": true,
+     "latency_ms": 1622,
+     "wrap": false
+    }
+   ],
+   "directions_matched": 1,
+   "directions_total": 4,
+   "presses_echoed": 6,
+   "presses_logged": 6,
+   "unexplained_moves": 0,
+   "lag_ms": 1611,
+   "jitter_ms": 27,
+   "menu": {
+    "appeared": true,
+    "latency_ms": 1967,
+    "vs_dpad_ms": 357
+   },
+   "logged_order_matches_pattern": false,
+   "latency_median_ms": 1611,
+   "in_relay_gap_band": true,
+   "tracker": "sam-3.1",
+   "frame_step_ms": 33,
+   "highlight_moves_seen": 6,
+   "sam_vs_fallback_agreement_permille": 718
+  },
+  {
+   "id": "p05",
+   "status": "partial",
+   "why": "unexplained_move",
+   "presses": [
+    {
+     "button": "DOWN",
+     "visible": true,
+     "echoed": true,
+     "latency_ms": 1199,
+     "wrap": false
+    },
+    {
+     "button": "LEFT",
+     "visible": false,
+     "echoed": true,
+     "latency_ms": null
+    },
+    {
+     "button": "RIGHT",
+     "visible": false,
+     "echoed": true,
+     "latency_ms": null
+    },
+    {
+     "button": "UP",
+     "visible": true,
+     "echoed": true,
+     "latency_ms": 1249,
+     "wrap": false
+    },
+    {
+     "button": "DOWN",
+     "visible": true,
+     "echoed": true,
+     "latency_ms": 1205,
+     "wrap": false
+    }
+   ],
+   "directions_matched": 4,
+   "directions_total": 4,
+   "presses_echoed": 5,
+   "presses_logged": 5,
+   "unexplained_moves": 1,
+   "lag_ms": 1205,
+   "jitter_ms": 44,
+   "menu": {
+    "appeared": true,
+    "latency_ms": 1601,
+    "vs_dpad_ms": 396
+   },
+   "logged_order_matches_pattern": false,
+   "latency_median_ms": 1205,
+   "in_relay_gap_band": true,
+   "tracker": "sam-3.1",
+   "frame_step_ms": 33,
+   "highlight_moves_seen": 4,
+   "sam_vs_fallback_agreement_permille": 1000
+  },
+  {
+   "id": "p06",
+   "status": "consistent",
+   "why": null,
+   "presses": [
+    {
+     "button": "LEFT",
+     "visible": false,
+     "echoed": true,
+     "latency_ms": null
+    },
+    {
+     "button": "DOWN",
+     "visible": true,
+     "echoed": true,
+     "latency_ms": 1691,
+     "wrap": false
+    },
+    {
+     "button": "RIGHT",
+     "visible": false,
+     "echoed": true,
+     "latency_ms": null
+    },
+    {
+     "button": "UP",
+     "visible": true,
+     "echoed": true,
+     "latency_ms": 1703,
+     "wrap": false
+    }
+   ],
+   "directions_matched": 4,
+   "directions_total": 4,
+   "presses_echoed": 4,
+   "presses_logged": 4,
+   "unexplained_moves": 0,
+   "lag_ms": 1697,
+   "jitter_ms": 6,
+   "menu": {
+    "appeared": true,
+    "latency_ms": 2069,
+    "vs_dpad_ms": 372
+   },
+   "logged_order_matches_pattern": true,
+   "latency_median_ms": 1697,
+   "in_relay_gap_band": true,
+   "tracker": "sam-3.1",
+   "frame_step_ms": 33,
+   "highlight_moves_seen": 2,
+   "sam_vs_fallback_agreement_permille": 1000
+  },
+  {
+   "id": "p07",
+   "status": "consistent",
+   "why": null,
+   "presses": [
+    {
+     "button": "DOWN",
+     "visible": true,
+     "echoed": true,
+     "latency_ms": 1478,
+     "wrap": false
+    },
+    {
+     "button": "LEFT",
+     "visible": false,
+     "echoed": true,
+     "latency_ms": null
+    },
+    {
+     "button": "RIGHT",
+     "visible": false,
+     "echoed": true,
+     "latency_ms": null
+    },
+    {
+     "button": "UP",
+     "visible": true,
+     "echoed": true,
+     "latency_ms": 1491,
+     "wrap": false
+    }
+   ],
+   "directions_matched": 4,
+   "directions_total": 4,
+   "presses_echoed": 4,
+   "presses_logged": 4,
+   "unexplained_moves": 0,
+   "lag_ms": 1485,
+   "jitter_ms": 7,
+   "menu": {
+    "appeared": true,
+    "latency_ms": 1889,
+    "vs_dpad_ms": 404
+   },
+   "logged_order_matches_pattern": false,
+   "latency_median_ms": 1484,
+   "in_relay_gap_band": true,
+   "tracker": "sam-3.1",
+   "frame_step_ms": 33,
+   "highlight_moves_seen": 2,
+   "sam_vs_fallback_agreement_permille": 980
+  },
+  {
+   "id": "p08",
+   "status": "consistent",
+   "why": null,
+   "presses": [
+    {
+     "button": "DOWN",
+     "visible": true,
+     "echoed": true,
+     "latency_ms": 1239,
+     "wrap": false
+    },
+    {
+     "button": "LEFT",
+     "visible": false,
+     "echoed": true,
+     "latency_ms": null
+    },
+    {
+     "button": "RIGHT",
+     "visible": false,
+     "echoed": true,
+     "latency_ms": null
+    },
+    {
+     "button": "UP",
+     "visible": true,
+     "echoed": true,
+     "latency_ms": 1254,
+     "wrap": false
+    }
+   ],
+   "directions_matched": 4,
+   "directions_total": 4,
+   "presses_echoed": 4,
+   "presses_logged": 4,
+   "unexplained_moves": 0,
+   "lag_ms": 1246,
+   "jitter_ms": 8,
+   "menu": {
+    "appeared": true,
+    "latency_ms": 1582,
+    "vs_dpad_ms": 336
+   },
+   "logged_order_matches_pattern": false,
+   "latency_median_ms": 1246,
+   "in_relay_gap_band": true,
+   "tracker": "sam-3.1",
+   "frame_step_ms": 33,
+   "highlight_moves_seen": 2,
+   "sam_vs_fallback_agreement_permille": 1000
+  },
+  {
+   "id": "p09",
+   "status": "consistent",
+   "why": null,
+   "presses": [
+    {
+     "button": "DOWN",
+     "visible": true,
+     "echoed": true,
+     "latency_ms": 1385,
+     "wrap": false
+    },
+    {
+     "button": "LEFT",
+     "visible": false,
+     "echoed": true,
+     "latency_ms": null
+    },
+    {
+     "button": "RIGHT",
+     "visible": false,
+     "echoed": true,
+     "latency_ms": null
+    },
+    {
+     "button": "UP",
+     "visible": true,
+     "echoed": true,
+     "latency_ms": 1413,
+     "wrap": false
+    }
+   ],
+   "directions_matched": 4,
+   "directions_total": 4,
+   "presses_echoed": 4,
+   "presses_logged": 4,
+   "unexplained_moves": 0,
+   "lag_ms": 1399,
+   "jitter_ms": 14,
+   "menu": {
+    "appeared": true,
+    "latency_ms": 1769,
+    "vs_dpad_ms": 370
+   },
+   "logged_order_matches_pattern": false,
+   "latency_median_ms": 1399,
+   "in_relay_gap_band": true,
+   "tracker": "sam-3.1",
+   "frame_step_ms": 33,
+   "highlight_moves_seen": 2,
+   "sam_vs_fallback_agreement_permille": 988
+  },
+  {
+   "id": "p10",
+   "status": "consistent",
+   "why": null,
+   "presses": [
+    {
+     "button": "DOWN",
+     "visible": true,
+     "echoed": true,
+     "latency_ms": 1211,
+     "wrap": false
+    },
+    {
+     "button": "LEFT",
+     "visible": false,
+     "echoed": true,
+     "latency_ms": null
+    },
+    {
+     "button": "RIGHT",
+     "visible": false,
+     "echoed": true,
+     "latency_ms": null
+    },
+    {
+     "button": "UP",
+     "visible": true,
+     "echoed": true,
+     "latency_ms": 1172,
+     "wrap": false
+    }
+   ],
+   "directions_matched": 4,
+   "directions_total": 4,
+   "presses_echoed": 4,
+   "presses_logged": 4,
+   "unexplained_moves": 0,
+   "lag_ms": 1191,
+   "jitter_ms": 20,
+   "menu": {
+    "appeared": true,
+    "latency_ms": 1650,
+    "vs_dpad_ms": 459
+   },
+   "logged_order_matches_pattern": false,
+   "latency_median_ms": 1192,
+   "in_relay_gap_band": true,
+   "tracker": "sam-3.1",
+   "frame_step_ms": 33,
+   "highlight_moves_seen": 2,
+   "sam_vs_fallback_agreement_permille": 988
+  }
+ ],
+ "cap": null,
+ "cost": {
+  "sam_frames": 1488,
+  "sam_usd_est_micro": 297600,
+  "model": "sam-3.1"
+ },
+ "summary": "8 consistent, 2 partial, 0 mismatch, 0 unscorable of 10 challenge window(s).",
+ "data_note": "Practice session (not match 170123, no receipt). Video and inputs stay private; this file holds per-press aggregates only."
+}
