@@ -15,7 +15,7 @@ Muse Spark explains the result in plain English and re-reads every locked score,
 SAM 3.1 shows what the referee saw. The AI never decides a verdict. Its signals can only lower `VERIFIED` to `PARTIAL`,
 never raise a status, never fail a match. QorTime is not a coach and gives no play advice.
 
-[![pytest 251 passed, 5 skipped](https://img.shields.io/badge/pytest-251%20passed%20%C2%B7%205%20skipped-2ef2ff?labelColor=04050a&logo=pytest&logoColor=white)](#quick-start)
+[![pytest 297 passed, 5 skipped](https://img.shields.io/badge/pytest-297%20passed%20%C2%B7%205%20skipped-2ef2ff?labelColor=04050a&logo=pytest&logoColor=white)](#quick-start)
 [![npm test 153 checks](https://img.shields.io/badge/npm%20test-153%20checks-2ef2ff?labelColor=04050a&logo=nodedotjs&logoColor=white)](#quick-start)
 [![no API key needed](https://img.shields.io/badge/tests%20%26%20demo-no%20API%20key%20needed-2ef2ff?labelColor=04050a)](#for-judges-verify-in-2-minutes)
 [![license: PolyForm Noncommercial 1.0.0](https://img.shields.io/badge/license-PolyForm%20Noncommercial%201.0.0-2ef2ff?labelColor=04050a)](LICENSE)
@@ -125,6 +125,7 @@ What to look for on **220105**, stated as plainly as on the page:
 | 4 | **Red team** | `python -m qortime_ai.redteam` | `Outside attacker: 25 attacks · 0 accepted` (offline, cached Muse Wonder output) |
 | 5 | **Evidence Lens** | Open [`examples/170123/seen/hl01-q4-a9-h0.seen.mp4`](examples/170123/seen/hl01-q4-a9-h0.seen.mp4), or `web/demo.html` (bottom panel) via the local server | Overlay labelled "SAM 3.1 · visualization, not a referee input" |
 | 6 | **AI can't decide** | `pytest -q tests/test_ai_ruling_signing.py tests/test_score_crosscheck.py` | Passes: deleting or tampering with the AI sidecars never changes the verdict; disagreement only lowers VERIFIED → PARTIAL |
+| 7 | **Agent verify API** (built Oct 28 2026, this week) | `curl "https://agent-api-production-0e55.up.railway.app/agent/v1/verify?url=https://qortime.com/matches/220105/"` · spec: [`/agent/v1/openapi.json`](https://agent-api-production-0e55.up.railway.app/agent/v1/openapi.json) · MCP: `/agent/mcp` · [`docs/AGENT_API.md`](docs/AGENT_API.md) | `"verified": true`, `"status": "VERIFIED"`, three passing reasons (pinned-key signature, public log entry seq 4, page score = receipt). An agent must only announce or record a result as VERIFIED when `verified` is true |
 
 **Demo video:** see the link at the top of this README. It opens with one line on what was pre-existing and what was
 built this week.
@@ -249,6 +250,7 @@ here.
 | Signed advisory files for match 170123 | `examples/170123/{ai_ruling,score_crosscheck,hands}.json` | Muse Spark 1.3 | — |
 | "What the referee saw" Evidence Lens: SAM 3.1 video-tracks the scorebug from the referee's own OCR region, motion split players / HUD / rest, `seen.v0` sidecar, cited Muse Spark captions, overlay render + web panel | `qortime_ai/seen/`, `web/seen-view.js`, `examples/170123/seen.json`, `examples/170123/seen/` | SAM 3.1, Muse Spark 1.3 | none (visualization, not a referee input) |
 | Challenge Echo: SAM 3.1 tracks the pause-menu highlight; each logged D-pad press must be echoed on screen (latency, directions matched, menu after OPTIONS), `echo.sidecar.json` | `qortime_ai/echo/`, `web/echo-view.js`, `examples/practice-echo/` | SAM 3.1 | info only; a mismatch can at most lower VERIFIED → PARTIAL |
+| Agent verify API (built Oct 28 2026): public read-only `GET /agent/v1/matches`, `/matches/{id}`, `/verify?url=`, OpenAPI 3.1 spec written for AI agents, and a read-only MCP endpoint. Re-runs the pre-existing verifier against the pinned referee key and checks the public log; qortime.com URLs only | `qortime_ai/agent_api/`, `deploy/agent-api/`, `docs/AGENT_API.md` | — (no model) | none (reports the verifier's result; agents must only announce VERIFIED when `verified` is true) |
 | README, docs and hero banners | `README.md`, `docs/`, sub-folder READMEs | — | — |
 
 File-by-file origin (qortime PR numbers): [`PROVENANCE.md`](PROVENANCE.md).
@@ -310,7 +312,7 @@ Requires Python ≥ 3.10, Node ≥ 20, git. **No API key needed for tests or the
 ./scripts/fetch_upstream.sh            # pre-existing qortime @ 0e87ec3 -> upstream/ (git-ignored) + 170123 receipt
 python -m venv .venv && . .venv/bin/activate
 pip install -e '.[dev]'                # installs the pinned pre-existing qor-receipt library as a dependency
-pytest -q                              # 251 passed, 5 skipped (referee-hook integration tests live upstream)
+pytest -q                              # 297 passed, 5 skipped (referee-hook integration tests live upstream)
 npm test                               # 7 browser-module test files, 153 checks
 node web/demo-170123.mjs               # offline: verdict from verify.js, then the signed Muse files, lower-only
 python -m http.server 8000             # from the repo root; then open http://localhost:8000/web/demo.html
@@ -335,11 +337,13 @@ qortime_ai/hands/       Show Your Hands: input integrity, overlay track, press-t
 qortime_ai/redteam/     Red-Team the Referee: Muse Wonder attacks, harness, cited Spark explanations, wording filter
 qortime_ai/seen/        "What the referee saw" Evidence Lens: SAM 3.1 video tracking, captions, overlay render
 qortime_ai/echo/        Challenge Echo: SAM 3.1 pause-menu highlight track vs logged D-pad presses
+qortime_ai/agent_api/   Agent verify API: read-only /agent/v1 endpoints, OpenAPI 3.1 spec, MCP endpoint (no model)
 web/                    browser panels, lower-only guard, auto-pin, advisory fetch, demo page, node tests
 tests/                  pytest suite (runs against the pinned pre-existing qortime checkout)
 examples/               signed advisory files for 170123, Evidence Lens samples, red-team report, Echo aggregates
 demo_pipeline/captions/ Muse Voice Transcribe caption timing for the demo video
 docs/                   feature write-ups and README hero banners
+deploy/agent-api/       Dockerfile for the agent verify API (Railway)
 scripts/                fetch_upstream.sh (pre-existing code, git-ignored, pinned)
 PROVENANCE.md           file-by-file origin, PR numbers, event-window dates
 ```
@@ -356,7 +360,7 @@ PROVENANCE.md           file-by-file origin, PR numbers, event-window dates
 
 No other Meta model (e.g. Muse Image) is used.
 
-**Open-source used by this code:** `cryptography`, `numpy`, `opencv-python-headless`, `pillow`, `meta-sam-parser`
+**Open-source used by this code:** `cryptography`, `fastapi` + `uvicorn` (agent verify API), `numpy`, `opencv-python-headless`, `pillow`, `meta-sam-parser`
 (SAM output parsing), `requests` (caption script), and for tests `pytest`, `fastapi`, `httpx`; FFmpeg (frame extraction,
 overlay encode, caption silence detection); Node.js ≥ 20 (browser-module tests); DejaVu fonts (overlay text). Pre-existing,
 not in this repo: `qor-receipt` from [ConWan30/qortime@0e87ec3](https://github.com/ConWan30/qortime/commit/0e87ec3).
