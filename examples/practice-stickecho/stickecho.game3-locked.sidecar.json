@@ -1,0 +1,90 @@
+{
+ "schema": "qortime.stickecho.v0",
+ "label": "INFO-ONLY, LOWER-ONLY. Stick Echo checks that the on-screen movement of the player being controlled follows the logged left stick. It never raises a status and never makes the call; a clear disagreement can only suggest lowering VERIFIED to PARTIAL. It does not show who held the controller.",
+ "built_during": "Meta AI Developer Hackathon, Oct 26 - Nov 4 2026 (built Oct 28 2026)",
+ "affects_verdict": "lower_only",
+ "max_cap": "PARTIAL",
+ "emits_status": false,
+ "receipt_jcs_sha256": null,
+ "sam_role": "Meta SAM 3.1 tracks the controlled player (box prompt seeded on the game's controlled-player marker, forward propagation). Marker detection, camera compensation, frame selection, the lag and the scoring are deterministic code.",
+ "method": {
+  "tracker": "sam-3.1",
+  "selection": "sam",
+  "lag_ms": 1361,
+  "response_offset_ms": 250,
+  "checks": [
+   "menu",
+   "switch"
+  ],
+  "preregistered": false
+ },
+ "clock": {
+  "lag_source": "challenge_echo",
+  "echo_clips": 1,
+  "echo_spread_ms": 0,
+  "video_start_us": 2360000,
+  "rule": "stick sample at frame time minus the lag (input clock); lag fixed before scoring"
+ },
+ "rules": {
+  "min_frames": 300,
+  "agree_z_centi": 300,
+  "disagree_z_centi": 100,
+  "min_speed_milli_px_per_frame": 600,
+  "min_stick_permille": 350,
+  "null_draws": 5000
+ },
+ "not_published": "frames, crops, per-frame boxes and velocities, per-window values, raw controller timeline",
+ "totals": {
+  "windows": 4,
+  "frames_scored": 343,
+  "mean_cos_permille": 556,
+  "within_45_deg_permille": 630,
+  "frames_selected_by_source": {
+   "sam": 408,
+   "marker": 0,
+   "dropped": 0
+  },
+  "free_checks": {
+   "rule": "drop-only: frames removed before scoring; never adds frames or raises a result",
+   "menu_frames_dropped": 0,
+   "switch_frames_dropped": 0,
+   "circle_presses_on_defense": 0,
+   "circle_presses_without_marker_jump": 0
+  }
+ },
+ "nulls": [
+  {
+   "source": "same_game",
+   "mean_permille": -18,
+   "sd_permille": 161,
+   "z_centi": 356,
+   "draws_ge_true_permille": 0
+  },
+  {
+   "source": "other_game_1",
+   "mean_permille": 4,
+   "sd_permille": 158,
+   "z_centi": 349,
+   "draws_ge_true_permille": 0
+  },
+  {
+   "source": "other_game_2",
+   "mean_permille": 17,
+   "sd_permille": 159,
+   "z_centi": 339,
+   "draws_ge_true_permille": 0
+  }
+ ],
+ "min_z_centi": 339,
+ "result": "agree",
+ "cap": null,
+ "diagnostics": {
+  "lag_sweep_peak_offset_ms": 100,
+  "note": "lag sweep is a diagnostic only; it never sets the lag"
+ },
+ "cost": {
+  "sam_frames": 455,
+  "sam_usd_est_micro": 91000
+ },
+ "summary": "controller and video agree: 343 frames in 4 window(s), mean cosine 556/1000, min z 3.39 over 3 null source(s); method sam (exploratory)."
+}
