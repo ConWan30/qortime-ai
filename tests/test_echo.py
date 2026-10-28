@@ -76,6 +76,73 @@ def test_moves_down_up_wrap_merge_and_gaps():
     assert mv[0].t == 0.3                                                  # box growing 100->108 is the same move
 
 
+# ---- wrap test from the menu's measured row pitch -----------------------------------------------------------------
+PITCH = 28.5                                  # SYNTHETIC geometry: 720p frame, menu rows 28.5 px apart
+
+
+def _rows(n, top=72.0, pitch=PITCH):
+    return [top + k * pitch for k in range(n)]
+
+
+def test_seven_row_menu_steps_and_wraps():
+    r = _rows(7)
+    tr = [(0.0, r[0]), (0.3, r[1]), (0.6, r[2]), (0.9, r[1]), (1.2, r[0]), (1.5, r[6] + 2), (1.8, r[0])]
+    mv = M.moves_from_track(tr, 720, row_pitch=PITCH)
+    assert [(m.direction, m.wrap) for m in mv] == [("DOWN", False), ("DOWN", False), ("UP", False), ("UP", False),
+                                                   ("UP", True), ("DOWN", True)]
+
+
+@pytest.mark.parametrize("scale", [1.0, 0.5])            # 720p and a 360p capture of the same menu
+def test_five_row_menu_wrap_is_a_wrap(scale):
+    """Halftime-style 5-row list: the wrap jump is 4 pitches (114 px at 720p, 57 px at 360p), under the old fixed
+    frame_h/6 rule, so that rule read it as a one-row move the other way. The pitch-based test calls it a wrap."""
+    h, pitch = int(720 * scale), PITCH * scale
+    r = _rows(5, top=72 * scale, pitch=pitch)
+    tr = [(0.0, r[0]), (0.3, r[0]), (0.6, r[4]), (0.9, r[4]), (1.2, r[0])]
+    mv = M.moves_from_track(tr, h, row_pitch=pitch)
+    assert [(m.direction, m.wrap) for m in mv] == [("UP", True), ("DOWN", True)]
+    old = M.moves_from_track(tr, h)                          # no measured pitch: fallback reproduces the old misread
+    assert [(m.direction, m.wrap) for m in old] == [("DOWN", False), ("UP", False)]
+
+
+@pytest.mark.parametrize("pitch", [10.0, 14.25, 28.5, 40.0, 60.0])
+@pytest.mark.parametrize("step", [0.6, 0.9, 1.0, 1.1, 1.32])   # 1.32: a taller highlighted row (sub-line) grows the box
+def test_single_row_move_is_never_a_wrap(pitch, step):
+    for h in (360, 720, 1080, 2160):
+        tr = [(0.0, 300.0), (0.3, 300.0 + step * pitch), (0.6, 300.0)]
+        mv = M.moves_from_track(tr, h, row_pitch=pitch)
+        assert not any(m.wrap for m in mv), (pitch, step, h)
+        if step * pitch >= h / 90:                           # below the min-step floor no move is reported at all
+            assert [(m.direction, m.wrap) for m in mv] == [("DOWN", False), ("UP", False)], (pitch, step, h)
+    assert M.WRAP_PITCHES * pitch < 2 * pitch                # the shortest wrap (3-row list) is still a wrap
+
+
+def test_wrap_threshold_basis_and_fallback():
+    assert M.wrap_threshold(720, 28.5) == (pytest.approx(M.WRAP_PITCHES * 28.5), "row_pitch")
+    assert M.wrap_threshold(720, None) == (pytest.approx(120.0), "frame_fraction_fallback")
+    assert M.wrap_threshold(720, 0) == (pytest.approx(120.0), "frame_fraction_fallback")
+
+
+def _menu_crop(n_rows, hl=0, pitch=PITCH, w=384, h=338, text=True):
+    """SYNTHETIC grey menu crop: dark list, white highlight box on row ``hl``, dimmer text bars on the other rows."""
+    g = np.full((h, w), 12, np.uint8)
+    for k, c in enumerate(_rows(n_rows, top=72, pitch=pitch)):
+        if k == hl:
+            g[int(c - 19):int(c + 20), 49:343] = 255
+        elif text:
+            g[int(c - 7):int(c + 7), 57:57 + 60 + 9 * k] = 180
+    return g
+
+
+@pytest.mark.parametrize("n", [7, 5])
+def test_row_pitch_measured_from_menu_frame(n):
+    from qortime_ai.echo import video as V
+
+    assert V.row_pitch(_menu_crop(n)) == pytest.approx(PITCH, abs=1.0)
+    assert V.row_pitch(_menu_crop(n, hl=2)) == pytest.approx(PITCH, abs=1.0)   # gap across the box is skipped
+    assert V.row_pitch(_menu_crop(n, text=False)) is None                     # nothing to measure -> fallback
+
+
 # ---- scoring ----------------------------------------------------------------------------------------------------
 def test_consistent_live_session():
     pr = presses()
@@ -276,3 +343,33 @@ def test_cli_end_to_end_synthetic(tmp_path):
     c = doc["clips"][0]
     assert S.check(doc) == [] and doc["cap"] is None and c["status"] == "consistent", c
     assert c["directions_matched"] == 4 and abs(c["latency_median_ms"] - 1200) <= 40
+
+
+def test_observe_five_row_menu_wrap_end_to_end(tmp_path):
+    """SYNTHETIC 360p video of a 5-row menu with text rows: UP on the first row wraps to the last. The pitch is
+    measured from the drawn rows and the deterministic track reads the jump as an UP wrap, not a DOWN step."""
+    cv2 = pytest.importorskip("cv2")
+    from qortime_ai.echo import video as V
+
+    fps, w, h, pitch, top = 30, 640, 360, 14.25, 36.0
+    rows = [top + k * pitch for k in range(5)]
+    path = tmp_path / "five_rows.mp4"
+    vw = cv2.VideoWriter(str(path), cv2.VideoWriter_fourcc(*"mp4v"), fps, (w, h))
+    for i in range(int(6.0 * fps)):
+        t = i / fps
+        if 1.0 <= t < 5.0:
+            f = np.full((h, w, 3), 10, np.uint8)
+            hl = 4 if t >= 3.0 else 0
+            for k, c in enumerate(rows):
+                if k == hl:
+                    cv2.rectangle(f, (25, int(c - 10)), (171, int(c + 10)), (255, 255, 255), -1)
+                else:
+                    cv2.rectangle(f, (29, int(c - 3)), (29 + 30 + 5 * k, int(c + 3)), (180, 180, 180), -1)
+        else:
+            f = np.full((h, w, 3), 90 + (i % 7), np.uint8)
+        vw.write(f)
+    vw.release()
+    obs = V.observe(path, 0.5, 5.5, use_sam=False)
+    assert obs.row_pitch == pytest.approx(pitch, abs=1.5)
+    mv = M.moves_from_track(obs.track, obs.size[1], row_pitch=obs.row_pitch)
+    assert [(m.direction, m.wrap) for m in mv] == [("UP", True)] and abs(mv[0].t - 3.0) < 0.05

@@ -14,6 +14,13 @@ log**: every logged D-pad press must be followed by the matching move of the pau
   prompt; "menu appeared" (whole-frame luma goes dark after OPTIONS); the matching. A deterministic tracker (bright
   rows of the highlight box) is the fallback when SAM is off or fails, and a cross-check: on the practice set SAM and
   the fallback agree on 98–100 % of frames in 9 of 10 windows (72 % in the sloppy one, where a sub-menu opens).
+- **Wrap test:** a jump counts as a wrap (DOWN on the last row → first row, UP on the first → last) when it is larger
+  than one row step could produce: above 1.6 row pitches. The pitch is measured, deterministically, from the spacing of
+  the menu's text rows outside the highlight box (median over frames across the menu window). One row step moves the
+  box centre by about one pitch (up to ~1.3 when the highlighted row is taller), and the shortest wrap, in a 3-row
+  list, is 2 pitches, so the test holds for any list length (the 7-row in-play menu and the 5-row menu alike). With no
+  measurable pitch it falls back to the original fixed rule (1/6 of the frame height). Each clip reports
+  `menu_geometry` (pitch, threshold, basis).
 - **Matching:** DOWN/UP must move the highlight one row (wrap included) within ±100 ms of the window's common lag;
   LEFT/RIGHT do nothing on this vertical menu, so Echo only checks the highlight held still (counted, marked
   `visible: false`). Per press: press-to-pixel latency in ms. Per window: directions matched N of M, jitter, and

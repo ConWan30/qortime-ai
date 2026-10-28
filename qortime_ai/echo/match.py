@@ -6,6 +6,12 @@ Clock: every time here is seconds on the VIDEO's timeline. Presses are mapped on
 Menu model (Madden pause menu, a vertical list): DOWN moves the highlight one row down, UP one row up, and both wrap
 (DOWN on the last row jumps to the first). LEFT and RIGHT do nothing on this menu, so for them Echo can only check
 that the highlight stayed still ("no-op held"); they are counted, but marked not visible.
+
+Wrap test: a wrap is a jump larger than one row step could produce. With the menu's row pitch measured from the frame
+(``video.row_pitch``), a one-row step moves the box centre by about one pitch (up to ~1.3 pitches when the highlighted
+row is taller, e.g. it carries a sub-line), while the shortest possible wrap, in a 3-row list, is 2 pitches. The test
+sits between them at ``WRAP_PITCHES`` pitches, so it holds for any list length. With no measured pitch it falls back
+to a fixed fraction of the frame height (the original rule).
 """
 from __future__ import annotations
 
@@ -21,6 +27,8 @@ RELAY_GAP_BAND_S = (0.5, 2.4)             # known capture/relay gap, reported ag
 MOVING = {"UP": -1, "DOWN": 1}
 STILL = ("LEFT", "RIGHT")
 STATUSES = ("consistent", "partial", "mismatch", "unscorable")
+WRAP_PITCHES = 1.6                        # wrap = jump > this many row pitches (one step <= ~1.3, any wrap >= 2)
+WRAP_FRAC_FALLBACK = 1 / 6                # no measured pitch: wrap = jump >= this fraction of the frame height
 
 
 @dataclass(frozen=True)
@@ -30,10 +38,21 @@ class Move:
     wrap: bool = False
 
 
+def wrap_threshold(frame_h: int, row_pitch: float | None = None, *,
+                   wrap_frac: float = WRAP_FRAC_FALLBACK) -> tuple[float, str]:
+    """(pixels, basis). A jump at or above the threshold is a wrap. Basis 'row_pitch' when the pitch was measured,
+    else 'frame_fraction_fallback'."""
+    if row_pitch is not None and row_pitch > 0:
+        return WRAP_PITCHES * float(row_pitch), "row_pitch"
+    return frame_h * wrap_frac, "frame_fraction_fallback"
+
+
 def moves_from_track(track: Sequence[tuple[float, float | None]], frame_h: int, *, min_step_frac: float = 1 / 90,
-                     wrap_frac: float = 1 / 6) -> list[Move]:
-    """Highlight moves from a (t, centre_y | None) track. Unknown frames are skipped, never treated as moves."""
-    min_step, wrap_px = frame_h * min_step_frac, frame_h * wrap_frac
+                     wrap_frac: float = WRAP_FRAC_FALLBACK, row_pitch: float | None = None) -> list[Move]:
+    """Highlight moves from a (t, centre_y | None) track. Unknown frames are skipped, never treated as moves.
+    ``row_pitch`` (px, same scale as the track) sets the wrap test; without it the frame-fraction fallback is used."""
+    min_step = frame_h * min_step_frac
+    wrap_px, _ = wrap_threshold(frame_h, row_pitch, wrap_frac=wrap_frac)
     out: list[Move] = []
     last = None
     for t, y in sorted(track, key=lambda x: x[0]):

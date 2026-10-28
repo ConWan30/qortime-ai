@@ -7,6 +7,8 @@ deterministic fallback), all on the video's own timeline.
   frame, which holds the list and nothing player-identifying), re-encoded at ``SAM_FPS``. A BOX prompt on frame 0
   seeds object 1 with the highlight box found by ``find_highlight``; SAM propagates it forward. Track = box centre y.
 * Fallback: ``find_highlight`` on every source frame (bright full-width rows of the highlight box).
+* Row pitch (deterministic, for the wrap test in ``match``): spacing of the menu's text lines outside the highlight
+  box, median over frames sampled across the menu window. None when it cannot be measured.
 Raw SAM output is cached outside the repo by the caller; only summary numbers reach the sidecar.
 """
 from __future__ import annotations
@@ -37,6 +39,11 @@ class VideoObs:
     tracker: str = "none"
     sam: dict[str, Any] = field(default_factory=dict)
     fallback_agreement: float | None = None
+    row_pitch: float | None = None
+
+
+TEXT_LUMA = 140          # menu text rows: grey above this inside the highlight box's column span
+PITCH_SAMPLES = 10
 
 
 def _cv2():
@@ -62,6 +69,40 @@ def find_highlight(gray_crop: np.ndarray) -> tuple[int, int, int, int] | None:
     if len(cols) < 2:
         return None
     return int(cols[0]), top, int(cols[-1]) + 1, bot
+
+
+def row_pitch(gray_crop: np.ndarray) -> float | None:
+    """Row pitch (px) of the menu list in one grey menu crop: median spacing between centres of consecutive text
+    lines outside the highlight box (pairs that straddle the box are skipped, its row is taller). Deterministic.
+    None without a highlight box, with fewer than two text lines, or when the spacing is implausible for the box."""
+    box = find_highlight(gray_crop)
+    if box is None:
+        return None
+    left, top, right, bot = box
+    on = (gray_crop[:, left:right] > TEXT_LUMA).mean(1) > 0.01
+    on[max(0, top - 2):bot + 2] = False
+    lines, start = [], None
+    for y, v in enumerate(on.tolist() + [False]):
+        if v and start is None:
+            start = y
+        elif not v and start is not None:
+            if y - start >= 3:
+                lines.append((start + y) / 2)
+            start = None
+    gaps = [b - a for a, b in zip(lines, lines[1:]) if not (a < top and b > bot)]
+    if not gaps:
+        return None
+    pitch = float(np.median(gaps))
+    return pitch if 0.5 * (bot - top) <= pitch <= 1.5 * (bot - top) else None
+
+
+def menu_row_pitch(frames: list[tuple[float, float, Any]], menu: dict[str, Any]) -> float | None:
+    """Median ``row_pitch`` over up to PITCH_SAMPLES frames spread across the menu window."""
+    inside = [c for t, _, c in frames if menu["onset_s"] <= t <= menu["end_s"]]
+    if not inside:
+        return None
+    ps = [p for p in (row_pitch(c) for c in inside[:: max(1, len(inside) // PITCH_SAMPLES)]) if p is not None]
+    return float(np.median(ps)) if ps else None
 
 
 def scan(path: Path, t0: float, t1: float) -> tuple[float, tuple[int, int], list[tuple[float, float, Any]]]:
@@ -194,6 +235,7 @@ def observe(path: Path, after_t: float, until_t: float, *, use_sam: bool, cache:
     obs = VideoObs(fps=fps, size=size, menu=menu)
     if not menu["present"]:
         return obs
+    obs.row_pitch = menu_row_pitch(frames, menu)
     fb = fallback_track(frames, menu)
     if use_sam:
         try:

@@ -11,7 +11,7 @@ deterministic tracker is the fallback (`--no-sam`) and a cross-check. **Info onl
 | File | Role |
 |---|---|
 | `presses.py` | press edges from `inputs.jsonl` |
-| `video.py` | SAM 3.1 highlight track (menu-list column only) + deterministic fallback tracker |
+| `video.py` | SAM 3.1 highlight track (menu-list column only) + deterministic fallback tracker; menu row pitch for the wrap test |
 | `match.py` | per-press latency, directions matched, jitter, menu after OPTIONS |
 | `sidecar.py` | `echo.sidecar.json` (`qortime.echo.v0`, integers only), lower-only cap |
 
