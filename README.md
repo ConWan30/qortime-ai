@@ -33,8 +33,9 @@ kept out; it is fetched at a pinned pre-event commit when you run or test this r
 > **Demo video (2:58):** `[DEMO VIDEO LINK — PLACEHOLDER: YouTube not uploaded yet]`. It opens with one line on what
 > was pre-existing and what was built this week.
 >
-> **Judges: verify it in 2 minutes** → [For judges](#for-judges-verify-in-2-minutes) · Live VERIFIED match:
-> [170123](https://qortime.com/matches/170123/) · [open it in the verifier](https://qortime.com/verify/?receipt=https%3A%2F%2Fqortime.com%2Fmatches%2F170123%2Freceipt.json&referee=b283cffb9279f2f90859268c64ef21861ef7e5d9fc773bdb8061af0e80624889)
+> **Judges: verify it in 2 minutes** → [For judges](#for-judges-verify-in-2-minutes) · Two live VERIFIED matches:
+> [170123](https://qortime.com/matches/170123/) ([verifier](https://qortime.com/verify/?receipt=https%3A%2F%2Fqortime.com%2Fmatches%2F170123%2Freceipt.json&referee=b283cffb9279f2f90859268c64ef21861ef7e5d9fc773bdb8061af0e80624889)) ·
+> [220105](https://qortime.com/matches/220105/) (played and verified during the event week)
 
 Not affiliated with Meta, EA, the NFL, Sony or Activision. Madden NFL is a trademark of its owner.
 
@@ -83,15 +84,42 @@ shows up on the pause menu. Info only.
 
 ## For judges: verify in 2 minutes
 
+**Two matches, both `VERIFIED` by the official QorTime referee** (`qortime-online-s2`, delegation serial 2 from root
+`qortime-v1`). Both are Madden NFL 27 on PS5, recorded with QorCap and reviewed after upload. The referee spot-checked
+the video segments, re-read the final, re-checked the three pause challenges, and ran motion and input-integrity
+checks. Each match folder also has a signed Muse Spark explanation (`ai_ruling.json`, AI advisory key). It explains
+the result and never decides it.
+
+| Match | When | Final (away – home) | Referee | Page | Verify |
+|---|---|---|---|---|---|
+| **170123** | Oct 23 2026, **before** the event | 10 – 0 | 7 of 7 checks pass · spot-check 166/525 segments | [qortime.com/matches/170123](https://qortime.com/matches/170123/) | [open in the verifier](https://qortime.com/verify/?receipt=https%3A%2F%2Fqortime.com%2Fmatches%2F170123%2Freceipt.json&referee=b283cffb9279f2f90859268c64ef21861ef7e5d9fc773bdb8061af0e80624889) |
+| **220105** | Oct 27 2026, **during** the event | 7 – 21 | 7 of 7 checks pass · spot-check 270/878 segments · public log entry #4 | [qortime.com/matches/220105](https://qortime.com/matches/220105/) | the page's **Verify it yourself** card: the verifier, plus an in-browser check of the referee's public log |
+
+What to look for on **220105**, stated as plainly as on the page:
+- **The final came through the referee's end-menu fallback.** The referee found no fourth-quarter scorebug in the last
+  part of the video, so it read the end-of-game menu and checked it against the last locked score in the signed
+  timeline. They matched. The fallback is pre-existing referee code, not something added for this match.
+- **One advisory flag is shown, not hidden:** `alignment_not_above_chance`. QorCap's on-device controller-vs-video
+  timing score was 435‰ against 477‰ for chance. It is advisory only. It is not one of the referee's seven checks and
+  it does not change the status. Human-likeness was 950‰, which is also advisory.
+- **Challenge Echo (SAM 3.1, info only) read all 3 official challenges as consistent** after
+  [PR #7](https://github.com/ConWan30/qortime-ai/pull/7). Median press-to-screen was 1637 / 1626 / 1662 ms
+  (kickoff / halftime / end). Echo never changes a verdict. The video and inputs stay private, so this run cannot be
+  reproduced from this repo.
+
 | # | Check | How | Expected |
 |---|---|---|---|
-| 1 | **Real match, no install** | Open the public verifier on the pre-existing VERIFIED match 170123 (signed Oct 23 2026): [qortime.com/verify/?receipt=…170123…](https://qortime.com/verify/?receipt=https%3A%2F%2Fqortime.com%2Fmatches%2F170123%2Freceipt.json&referee=b283cffb9279f2f90859268c64ef21861ef7e5d9fc773bdb8061af0e80624889) | Gold **VERIFIED** (away 10 – home 0), then the event-built panels: signed Muse Spark explanation, "Muse Spark agrees with 2 of 2 checked locked scores", Show Your Hands. The verifier and match page are pre-existing; the panels are this repo. |
-| 2 | **Offline, from this repo** (no API key, ~2 min) | Run the first block in [Quick start](#quick-start), then `node web/demo-170123.mjs` | Output below |
-| 3 | **Red team** | `python -m qortime_ai.redteam` | `Outside attacker: 25 attacks · 0 accepted` (offline, cached Muse Wonder output) |
-| 4 | **Evidence Lens** | Open [`examples/170123/seen/hl01-q4-a9-h0.seen.mp4`](examples/170123/seen/hl01-q4-a9-h0.seen.mp4), or `web/demo.html` (bottom panel) via the local server | Overlay labelled "SAM 3.1 · visualization, not a referee input" |
-| 5 | **AI can't decide** | `pytest -q tests/test_ai_ruling_signing.py tests/test_score_crosscheck.py` | Passes: deleting or tampering with the AI sidecars never changes the verdict; disagreement only lowers VERIFIED → PARTIAL |
+| 1 | **Real match, no install** | Open the 170123 verifier link above, or the **Verify it yourself** card on the 220105 page | Gold **VERIFIED**. On 170123 you also get the event-built panels: signed Muse Spark explanation, "Muse Spark agrees with 2 of 2 checked locked scores", Show Your Hands. The verifier and match pages are pre-existing; the panels are this repo. |
+| 2 | **Public log** | `curl https://qortime-referee-production.up.railway.app/v1/log/inclusion/8a3a6d60e498c607fef79e013afab333b760fb7c9e58e16fa9912683c98cb71b` | Entry `seq 4`, submission `1d424dc2836f1a8c`, match `local-20261027-220105` |
+| 3 | **Offline, from this repo** (no API key, ~2 min) | Run the first block in [Quick start](#quick-start), then `node web/demo-170123.mjs` | Output below |
+| 4 | **Red team** | `python -m qortime_ai.redteam` | `Outside attacker: 25 attacks · 0 accepted` (offline, cached Muse Wonder output) |
+| 5 | **Evidence Lens** | Open [`examples/170123/seen/hl01-q4-a9-h0.seen.mp4`](examples/170123/seen/hl01-q4-a9-h0.seen.mp4), or `web/demo.html` (bottom panel) via the local server | Overlay labelled "SAM 3.1 · visualization, not a referee input" |
+| 6 | **AI can't decide** | `pytest -q tests/test_ai_ruling_signing.py tests/test_score_crosscheck.py` | Passes: deleting or tampering with the AI sidecars never changes the verdict; disagreement only lowers VERIFIED → PARTIAL |
 
-Expected output of step 2 (abridged):
+**Demo video:** see the link at the top of this README. It opens with one line on what was pre-existing and what was
+built this week.
+
+Expected output of step 3 (abridged):
 ```text
 verdict (verify.js, deterministic): VERIFIED   referee key auto-pinned: yes (delegation)
 after lower-only advisory signals:  VERIFIED (unchanged)
@@ -187,6 +215,13 @@ This repo uses that code only as a **pinned dependency** (`pyproject.toml` → `
 **git-ignored checkout** (`scripts/fetch_upstream.sh` → `upstream/qortime/`, same commit). Nothing from it is committed
 here. The only pre-existing data used is the public receipt of match 170123, fetched from that checkout into
 `examples/170123/` (git-ignored).
+
+**The two verified matches.** Match 170123 and its page are pre-existing (signed Oct 23 2026). Match 220105 was
+played, uploaded and verified on Oct 27 2026, during the event. The live referee that reviewed it runs qortime code
+from after the pinned commit, including changes made in the qortime repo during the event week: motion rule v4
+(Oct 26) and the referee's automatic advisory hooks for this repo's Muse files. The 220105 match page, its signed Muse
+Spark explanation and its Challenge Echo run were also made during the event. The page lives in the qortime repo, not
+here.
 
 ### Built Oct 26 – Nov 4, 2026 (in this repo)
 | What | Path | Meta model | Effect on the verdict |
@@ -335,9 +370,19 @@ not in this repo: `qor-receipt` from [ConWan30/qortime@0e87ec3](https://github.c
   device status is at most "TPM claimed (unverified)".
 - **QorTime does not prove who held the controller and does not catch collusion.**
 - **Not a coach.** Anti-cheat and verified skill only; prompts forbid play advice and the guardrail drops it.
-- **Measured limits, stated plainly:** on 170123, Show Your Hands press-to-pixel is *not scored* (clips could not be
-  aligned); SAM's still-frame scorebug locator found the scorebug on 4 of 6 frames, so it is never a status signal; the
-  insider red-team pass found 5 inner-check gaps in the pre-existing verifier, reported and left unchanged.
+- **Limits, stated plainly.** Two referee-verified matches is a small sample (n = 2), not a measured accuracy. Both
+  are Madden NFL 27 on PS5, one player's own matches, with only the home or away side recorded (single-sided, no
+  two-player corroboration). The referee spot-checks video segments (166/525 and 270/878) rather than re-hashing all
+  of them, and it cannot prove the footage was not edited before QorCap hashed it, except where an official challenge
+  or anchor timestamps the chain. On 220105 the final came from the end-of-game menu checked against the last locked
+  score, because the referee found no fourth-quarter scorebug at the end of the video. On 220105 the controller-timing
+  advisory did not clear chance (`alignment_not_above_chance`, 435‰ vs 477‰). It is advisory only, but it is a real
+  weak signal and we show it. Challenge Echo cannot score SQUARE presses and only checks that LEFT/RIGHT leave the
+  highlight still. Before PR #7 it misread a 5-row halftime menu wrap as a mismatch. On 170123, Show Your Hands
+  press-to-pixel is *not scored* (clips could not be aligned), and SAM's still-frame scorebug locator found the
+  scorebug on 4 of 6 frames, so it is never a status signal. The insider red-team pass found 5 inner-check gaps in the
+  pre-existing verifier, reported and left unchanged. Device status is never above "TPM claimed (unverified)", and
+  QorTime never shows who held the controller.
 - **No secrets, raw match footage, raw controller logs, gamertags, OCR weights or held-out game data in this repo.**
 
 Per-module detail: [`qortime_ai/ai_ruling/README.md`](qortime_ai/ai_ruling/README.md) ·
