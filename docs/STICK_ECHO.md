@@ -28,10 +28,11 @@ agree"**. That is all it says: it does not show who held the controller.
    receipt; `receipt.v0.json` is untouched). `agree` / `inconclusive` / `unscorable` (< 300 scored frames) add a note;
    `disagree` (z < 1 against every null) can suggest VERIFIED → PARTIAL and nothing else (`sidecar.py`, tests).
 
-## Results on two private practice games (totals only)
+## Results on three private practice games (totals only)
 
 Both games were offline practice games, never submitted to the referee. Video and controller logs stay private; only
-totals are published. Game A is the first test, game B the second; the bar was set before game B was scored.
+totals are published. Game A is the first test, game B the second; the bar was set before game B was scored. Game C was scored with
+settings written down and hashed before the game was played.
 
 ![Stick Echo totals](stick-echo/totals.png)
 
@@ -43,12 +44,23 @@ totals are published. Game A is the first test, game B the second; the bar was s
 | B | `hybrid`, Echo lag | 519 | 0.66 | 4.47 / 4.12 / 3.67 | exploratory |
 | A | `hybrid`, + response offset from game B | 191 | 0.55 | 3.07 / 3.01 / 2.81 | exploratory |
 | B | `hybrid`, + response offset from game A | 514 | 0.79 | 5.41 / 4.95 / 4.45 | exploratory |
+| **C** | **`sam`, Echo lag + 250 ms, `--checks menu,switch` (locked before the game)** | **343** | **0.56** | **3.56 / 3.49 / 3.39** | **meets the bar** |
+| C | `sam`, Echo lag (original pre-registered method, for continuity) | 331 | 0.56 | 2.96 / 2.88 / 2.79 | below the bar |
 
 **Exploratory means tuned after seeing results.** `hybrid` was designed after game B's results showed SAM leaving
 the controlled player on small, far-away players. The response offset came from the lag sweeps: on both games,
 movement agreement peaks 0.2–0.3 s after the pause-menu lag (players accelerate and turn; a menu highlight does not).
 Each game's offset was taken from the **other** game only, but with two games this is still exploratory. Neither
-change is the bar until it is fixed in advance and checked on a new game. A stricter selection rule written down
+change is the bar until it is fixed in advance and checked on a new game.
+
+**Game C (Oct 28 2026).** The settings were written down and hashed before game C existed. They were the `sam`
+selection, the Echo lag plus a 250 ms response offset, and the free `menu` and `switch` checks. The nulls were this
+game plus the two earlier games. Game C meets the bar under those settings: 343 frames in 4 windows, lowest z 3.39.
+The free checks dropped no frames. The original pre-registered method (no offset, no checks) scores 331 frames with
+lowest z 2.79, which is below the bar. Totals: [`examples/practice-stickecho/stickecho.game3-locked.sidecar.json`](../examples/practice-stickecho/stickecho.game3-locked.sidecar.json).
+That sidecar says `preregistered: false` because the offset and the checks were chosen after games A and B. They
+were locked before game C. Exploratory text-prompt SAM calls on games A and B returned no objects, so tracking stays
+box-seeded from the controlled-player marker. A stricter selection rule written down
 before the re-score (SAM within a tight distance of the marker) kept too few frames (139 and 39) and is not used.
 
 ## Free local checks (built Oct 28 2026, exploratory, drop-only)
@@ -96,8 +108,9 @@ How they were tested (two practice games; rules written down before measuring; t
   (they are hash times, not frame times), so they are not used for alignment.
 
 ## Limits
-- Two practice games from one player, one title (Madden NFL 27, PS5), one capture setup. Not a measured accuracy.
-- Game A is below the bar. Game B meets it, and its weakest null (3.11) is just over the line.
+- Three practice games from one player, one title (Madden NFL 27, PS5), one capture setup. Not a measured accuracy.
+- Game A is below the bar. Game B meets it, and its weakest null (3.11) is just over the line. Game C meets the
+  locked bar (lowest z 3.39) with 343 frames, close to the 300-frame minimum.
 - The marker detector is tuned to this title's controlled-player marker; new teams, stadiums or titles need checks.
 - Pass windows depend on reading the receiver icons; few throws are clean catches, so they add little.
 - Stick magnitude vs on-screen speed was tested and is not a consistent signal (none on game B; players mostly run at
