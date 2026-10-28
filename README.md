@@ -315,7 +315,7 @@ games). The lag is fixed beforehand from the same game's pause challenges (Chall
 - **Practice results** (three private offline practice games, never submitted to the referee; totals only). The bar
   is z ≥ 3 against every null:
 
-  | Game | Settings | Frames | z vs same game / other game 1 / other game 2 | Result |
+  | Game | Settings | Frames | z vs same game / 170123 log / 220105 log | Result |
   |---|---|---|---|---|
   | A (first test) | `sam`, Echo lag | 222 | 3.15 / 2.88 / 2.68 | below the bar |
   | B | `sam`, Echo lag, **pre-registered before scoring** | 543 | **3.87 / 3.56 / 3.11** | controller and video agree |
