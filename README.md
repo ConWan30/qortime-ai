@@ -8,15 +8,20 @@
 
 **Meta models explain and stress-test a video-game referee's result. They never decide it.**
 
-QorTime is video-game integrity verification: anti-cheat plus verified skill for console head-to-head matches, with a
-signed match receipt anyone can check. A deterministic referee checks that signed, hash-chained receipt and returns
+> **Video (under 3 min):** https://youtu.be/vlGJ1LXxumE<br>
+> **Verifier:** [match 170123, referee key pinned](https://qortime.com/verify/?receipt=https%3A%2F%2Fqortime.com%2Fmatches%2F170123%2Freceipt.json&referee=b283cffb9279f2f90859268c64ef21861ef7e5d9fc773bdb8061af0e80624889) (unpinned shows PARTIAL, as expected) · [match 220105 page](https://qortime.com/matches/220105/)<br>
+> **Judge check (offline, no API key):** `./scripts/fetch_upstream.sh && pip install -e '.[dev]' && pytest -q && node web/demo-170123.mjs` ([details](#for-judges-verify-in-2-minutes))<br>
+> **Meta models used:** Muse Spark 1.3, SAM 3.1, Muse Wonder 1.0, Muse Voice Transcribe 1.0 ([results](#meta-model-results)). They explain and never decide.
+
+Toward anti-cheat and verified skill: integrity checks for console head-to-head results, with a signed receipt anyone
+can re-check and its limits stated next to it. A deterministic referee checks that signed, hash-chained receipt and returns
 `VERIFIED`, `PARTIAL`, `SELF-SIGNED` or `FAIL`. **This repo is the AI layer built on top of it during the hackathon**:
 Muse Spark explains the result in plain English and re-reads every locked score, Muse Wonder attacks the verifier,
 SAM 3.1 shows what the referee saw. The AI never decides a verdict. Its signals can only lower `VERIFIED` to `PARTIAL`,
 never raise a status, never fail a match. QorTime is not a coach and gives no play advice.
 
-[![pytest 397 passed, 5 skipped](https://img.shields.io/badge/pytest-397%20passed%20%C2%B7%205%20skipped-2ef2ff?labelColor=04050a&logo=pytest&logoColor=white)](#quick-start)
-[![npm test 182 checks](https://img.shields.io/badge/npm%20test-182%20checks-2ef2ff?labelColor=04050a&logo=nodedotjs&logoColor=white)](#quick-start)
+[![tests: pytest](https://img.shields.io/badge/tests-pytest-2ef2ff?labelColor=04050a&logo=pytest&logoColor=white)](#quick-start)
+[![tests: npm test](https://img.shields.io/badge/tests-npm%20test-2ef2ff?labelColor=04050a&logo=nodedotjs&logoColor=white)](#quick-start)
 [![no API key needed](https://img.shields.io/badge/tests%20%26%20demo-no%20API%20key%20needed-2ef2ff?labelColor=04050a)](#for-judges-verify-in-2-minutes)
 [![license: PolyForm Noncommercial 1.0.0](https://img.shields.io/badge/license-PolyForm%20Noncommercial%201.0.0-2ef2ff?labelColor=04050a)](LICENSE)
 <br>
@@ -33,7 +38,7 @@ kept out; it is fetched at a pinned pre-event commit when you run or test this r
 > **Demo video (under 3 minutes):** https://youtu.be/vlGJ1LXxumE. It opens with one line on what
 > was pre-existing and what was built this week.
 >
-> **Judges: verify it in 2 minutes** → [For judges](#for-judges-verify-in-2-minutes) · Two live VERIFIED matches:
+> **Judges: verify it in 2 minutes** → [For judges](#for-judges-verify-in-2-minutes) · Two matches VERIFIED by the official referee (referee key pinned; unpinned shows PARTIAL):
 > [170123](https://qortime.com/matches/170123/) ([verifier](https://qortime.com/verify/?receipt=https%3A%2F%2Fqortime.com%2Fmatches%2F170123%2Freceipt.json&referee=b283cffb9279f2f90859268c64ef21861ef7e5d9fc773bdb8061af0e80624889)) ·
 > [220105](https://qortime.com/matches/220105/) (played and verified during the event week)
 
@@ -53,8 +58,9 @@ the status or overclaims. Fail-closed.
 
 **Attack** · Muse Wonder 1.0
 
-Red-Team the Referee: 26 Muse-written tampering attacks against the unmodified verifier.
-**Outside attacker: 25 attacks · 0 accepted.**
+Red-Team the Referee: Muse Wonder wrote 26 attacks, 25 tampered receipts plus 1 byte-identical replay (reported
+separately), run against the unmodified verifier on a synthetic match with synthetic TEST keys.
+**Outside attacker: 0 of 25 accepted · insider holding the TEST keys: 12 of 25 accepted** (labelled "needs key protection").
 
 </td>
 <td width="33%" valign="top">
@@ -68,7 +74,7 @@ shows up on the pause menu. Stick Echo checks the controlled player moves with t
 </tr>
 </table>
 
-**Why this matters.** Today the only way a gamer can show they're good is to perform live, for hours, for whoever happens to be watching. Many creators say a 3-hour stream reaches a few hundred people, and they burn out before anyone notices them. QorTime moves the proof into the match itself. Every verified game produces a signed receipt and a public match page anyone can check, whether ten thousand people watched or nobody did. Where we're headed: a record of verified skill and play time that players build just by playing, which they can share, get ranked on, and eventually get paid for, without having to stream.
+**Why this matters.** Today the only way a gamer can show they're good is to perform live, for hours, for whoever happens to be watching, and often almost nobody is. QorTime moves the proof into the match itself. Every verified game produces a signed receipt and a public match page anyone can check, whether ten thousand people watched or nobody did. Where we're headed: a record of verified skill and play time that players build just by playing, which they can share and be ranked on, without having to stream.
 
 ## Who benefits
 - **Players in competitive head-to-head matches** who want a result both sides can check, instead of a screenshot and an argument.
@@ -83,11 +89,14 @@ This describes who it is built for. It is not a customer or partner list.
 [Who benefits](#who-benefits) ·
 [For judges](#for-judges-verify-in-2-minutes) ·
 [Where Meta AI is used](#where-meta-ai-is-used) ·
+[Meta model results](#meta-model-results) ·
 [How it works](#how-it-works) ·
 [Built this week vs pre-existing](#built-this-week-vs-pre-existing) ·
 [Evidence Lens](#what-the-referee-saw-sam-31-evidence-lens--visualization-only) ·
 [Challenge Echo](#challenge-echo-sam-31--info-only-lower-only) ·
 [Stick Echo](#stick-echo-sam-31--info-only-lower-only) ·
+[Commentary witness](docs/COMMENTARY_WITNESS.md) ·
+[Agent API](docs/AGENT_API.md) ·
 [Red-Team the Referee](#red-team-the-referee) ·
 [Quick start](#quick-start) ·
 [Repo layout](#repo-layout) ·
@@ -97,7 +106,7 @@ This describes who it is built for. It is not a customer or partner list.
 
 ## For judges: verify in 2 minutes
 
-**Two matches, both `VERIFIED` by the official QorTime referee** (`qortime-online-s2`, delegation serial 2 from root
+**Two matches, both `VERIFIED` by the official QorTime referee (referee key pinned; unpinned shows PARTIAL)** (`qortime-online-s2`, delegation serial 2 from root
 `qortime-v1`). Both are Madden NFL 27 on PS5, recorded with QorCap and reviewed after upload. The referee spot-checked
 the video segments, re-read the final, re-checked the three pause challenges, and ran motion and input-integrity
 checks. Each match folder also has a signed Muse Spark explanation (`ai_ruling.json`, AI advisory key). It explains
@@ -105,8 +114,12 @@ the result and never decides it.
 
 | Match | When | Final (away – home) | Referee | Page | Verify |
 |---|---|---|---|---|---|
-| **170123** | Oct 23 2026, **before** the event | 10 – 0 | 7 of 7 checks pass · spot-check 166/525 segments | [qortime.com/matches/170123](https://qortime.com/matches/170123/) | [open in the verifier](https://qortime.com/verify/?receipt=https%3A%2F%2Fqortime.com%2Fmatches%2F170123%2Freceipt.json&referee=b283cffb9279f2f90859268c64ef21861ef7e5d9fc773bdb8061af0e80624889) |
+| **170123** | Oct 23 2026, **before** the event | 10 – 0 | 7 of 7 checks pass · spot-check 166/525 segments · public log entry #1 | [qortime.com/matches/170123](https://qortime.com/matches/170123/) | [open in the verifier](https://qortime.com/verify/?receipt=https%3A%2F%2Fqortime.com%2Fmatches%2F170123%2Freceipt.json&referee=b283cffb9279f2f90859268c64ef21861ef7e5d9fc773bdb8061af0e80624889) |
 | **220105** | Oct 27 2026, **during** the event | 7 – 21 | 7 of 7 checks pass · spot-check 270/878 segments · public log entry #4 | [qortime.com/matches/220105](https://qortime.com/matches/220105/) | the page's **Verify it yourself** card: the verifier, plus an in-browser check of the referee's public log |
+
+**Referee log entries without a page.** The referee's public log has 6 entries (seq 0–5). Only seq 1 (170123) and seq 4
+(220105) are VERIFIED, and only they have pages. Seq 0 is an earlier PARTIAL submission of 170123. Seq 2, 3 and 5 are PARTIAL
+results for two other matches. Each is listed in [`PROVENANCE.md`](PROVENANCE.md#referee-log-entries-without-a-match-page).
 
 What to look for on **220105**, stated as plainly as on the page:
 - **The final came through the referee's end-menu fallback.** The referee found no fourth-quarter scorebug in the last
@@ -124,12 +137,12 @@ What to look for on **220105**, stated as plainly as on the page:
 | # | Check | How | Expected |
 |---|---|---|---|
 | 1 | **Real match, no install** | Open the 170123 verifier link above, or the **Verify it yourself** card on the 220105 page | Gold **VERIFIED**. On 170123 you also get the event-built panels: signed Muse Spark explanation, "Muse Spark agrees with 2 of 2 checked locked scores", Show Your Hands. The verifier and match pages are pre-existing; the panels are this repo. |
-| 2 | **Public log** | `curl https://qortime-referee-production.up.railway.app/v1/log/inclusion/8a3a6d60e498c607fef79e013afab333b760fb7c9e58e16fa9912683c98cb71b` | Entry `seq 4`, submission `1d424dc2836f1a8c`, match `local-20261027-220105` |
+| 2 | **Public log** | `curl https://qortime-referee-production.up.railway.app/v1/log/inclusion/8a3a6d60e498c607fef79e013afab333b760fb7c9e58e16fa9912683c98cb71b` | Entry `seq 4`, submission `1d424dc2836f1a8c`, match `local-20261027-220105`. **Offline equivalent:** `pytest -q tests/test_agent_api.py` re-checks a committed log-inclusion proof (match 170123, seq 1) from [`tests/fixtures/agent_api/`](tests/fixtures/agent_api/) without network |
 | 3 | **Offline, from this repo** (no API key, ~2 min) | Run the first block in [Quick start](#quick-start), then `node web/demo-170123.mjs` | Output below |
-| 4 | **Red team** | `python -m qortime_ai.redteam` | `Outside attacker: 25 attacks · 0 accepted` (offline, cached Muse Wonder output) |
+| 4 | **Red team** | `python -m qortime_ai.redteam` | `Outside attacker: 25 attacks · 0 accepted` and `Insider with signing keys: 25 attacks · 12 accepted`, plus 1 replay reported separately (offline, cached Muse Wonder output, synthetic TEST keys) |
 | 5 | **Evidence Lens** | Open [`examples/170123/seen/hl01-q4-a9-h0.seen.mp4`](examples/170123/seen/hl01-q4-a9-h0.seen.mp4), or `web/demo.html` (bottom panel) via the local server | Overlay labelled "SAM 3.1 · visualization, not a referee input" |
 | 6 | **AI can't decide** | `pytest -q tests/test_ai_ruling_signing.py tests/test_score_crosscheck.py` | Passes: deleting or tampering with the AI sidecars never changes the verdict; disagreement only lowers VERIFIED → PARTIAL |
-| 7 | **Agent verify API** (built Oct 28 2026, this week) | `curl "https://agent-api-production-0e55.up.railway.app/agent/v1/verify?url=https://qortime.com/matches/220105/"` · spec: [`/agent/v1/openapi.json`](https://agent-api-production-0e55.up.railway.app/agent/v1/openapi.json) · MCP: `/agent/mcp` · [`docs/AGENT_API.md`](docs/AGENT_API.md) | `"verified": true`, `"status": "VERIFIED"`, three passing reasons (pinned-key signature, public log entry seq 4, page score = receipt). An agent must only announce or record a result as VERIFIED when `verified` is true |
+| 7 | **Agent verify API** (built Oct 28 2026, this week) | `curl "https://agent-api-production-0e55.up.railway.app/agent/v1/verify?url=https://qortime.com/matches/220105/"` · spec: [`/agent/v1/openapi.json`](https://agent-api-production-0e55.up.railway.app/agent/v1/openapi.json) · MCP: `/agent/mcp` · [`docs/AGENT_API.md`](docs/AGENT_API.md) | `"verified": true`, `"status": "VERIFIED"`, three passing reasons (pinned-key signature, public log entry seq 4, page score = receipt). An agent must only announce or record a result as VERIFIED when `verified` is true. **Offline equivalent:** `pytest -q tests/test_agent_api.py::test_verify_real_receipt_is_true` runs the same API against the 170123 receipt and the fixtures in [`tests/fixtures/agent_api/`](tests/fixtures/agent_api/) |
 
 **Demo video:** see the link at the top of this README. It opens with one line on what was pre-existing and what was
 built this week.
@@ -165,6 +178,19 @@ verifier; every model output lands in a separate sidecar next to the receipt.
 | **Muse Wonder 1.0** | Red-team attacker: proposes receipt-tampering attacks as structured JSON mutations | [`qortime_ai/redteam/generate.py`](qortime_ai/redteam/generate.py) (one live run, cached in [`fixtures/wonder_attacks.json`](qortime_ai/redteam/fixtures/wonder_attacks.json)) | **None.** Attacks the verifier; never edits it |
 | **Muse Voice Transcribe 1.0** + **Muse Spark 1.3** | Commentary witness (built Oct 28 2026): transcribes a recorded match's broadcast commentary, Muse Spark lists the scoring plays the commentators call, code matches them to the referee's locked scores. On 170123's 3 public clips: 3 of 3 agree (dev check on the same clips, after one prompt revision; full-game false-call rate not yet measured). See [`docs/COMMENTARY_WITNESS.md`](docs/COMMENTARY_WITNESS.md) | [`qortime_ai/commentary/`](qortime_ai/commentary/) | **Info only, lower only.** Broadcast agrees = no change; disagrees = VERIFIED → PARTIAL; muted/absent commentary or ASR failure = "broadcast unchecked", no penalty |
 | **Muse Voice Transcribe 1.0** | Event-stream ASR of the demo narration; each partial's `audioProcessedMs` times the captions (v6 narration; later cuts were timed from the text-to-speech timestamps) | [`demo_pipeline/captions/transcribe_stream.py`](demo_pipeline/captions/transcribe_stream.py), [`make_srt.py`](demo_pipeline/captions/make_srt.py) (reproduces `data/vo-v6-captions.srt` byte-for-byte) | n/a (video only) |
+
+### Meta model results
+Every number below is already stated elsewhere in this README. The source is listed for each. These are small dev checks, not measured accuracy.
+
+| Model | Result | Source |
+|---|---|---|
+| Muse Spark 1.3 | Score cross-check on 170123: 2 of 2 checked locked scores agree (third: unsure, unchecked). Dev bench, not held out: 73/73 visible scores | [table above](#where-meta-ai-is-used), [`docs/SCORE_BENCH.md`](docs/SCORE_BENCH.md) |
+| Muse Wonder 1.0 | 26 attacks (25 tampers + 1 replay). Outside attacker 0 of 25 accepted; insider with the synthetic TEST keys 12 of 25 accepted | [Red-Team the Referee](#red-team-the-referee) |
+| SAM 3.1 (Evidence Lens) | Scorebug in place on 359/359 and 360/360 frames (hl00, hl01); hl02 249/360 until a game graphic replaces it | [Evidence Lens](#what-the-referee-saw-sam-31-evidence-lens--visualization-only) |
+| SAM 3.1 (Challenge Echo) | Practice game: 8 consistent, 2 partial, 0 mismatch over 10 windows. 220105: all 3 official challenges consistent | [Challenge Echo](#challenge-echo-sam-31--info-only-lower-only), [For judges](#for-judges-verify-in-2-minutes) |
+| SAM 3.1 (Stick Echo) | 2 of 3 private practice games clear the bar (z ≥ 3 against every null) | [Stick Echo](#stick-echo-sam-31--info-only-lower-only) |
+| SAM 3.1 (scorebug locator) | Found the scorebug on 4 of 6 still frames, so it is never a status signal | [Honesty rules and limits](#honesty-rules-and-limits) |
+| Muse Voice Transcribe 1.0 + Muse Spark 1.3 | Commentary witness on 170123's 3 public clips: 3 of 3 agree (dev check); full-game false-call rate not yet measured | [table above](#where-meta-ai-is-used), [`docs/COMMENTARY_WITNESS.md`](docs/COMMENTARY_WITNESS.md) |
 
 Keys come only from the environment (`META_API_KEY`); nothing in this repo contains a key. No other Meta model
 (e.g. Muse Image) is used. Model IDs and endpoints: [Models, services and open-source](#models-services-and-open-source-used).
@@ -354,12 +380,12 @@ Requires Python ≥ 3.10, Node ≥ 20, git. **No API key needed for tests or the
 ./scripts/fetch_upstream.sh            # pre-existing qortime @ 0e87ec3 -> upstream/ (git-ignored) + 170123 receipt
 python -m venv .venv && . .venv/bin/activate
 pip install -e '.[dev]'                # installs the pinned pre-existing qor-receipt library as a dependency
-pytest -q                              # 397 passed, 5 skipped (referee-hook integration tests live upstream)
-npm test                               # 8 browser-module test files, 182 checks
+pytest -q                              # referee-hook integration tests are skipped here (they live upstream)
+npm test                               # browser-module tests
 node web/demo-170123.mjs               # offline: verdict from verify.js, then the signed Muse files, lower-only
 python -m http.server 8000             # from the repo root; then open http://localhost:8000/web/demo.html
 ```
-Counts re-checked Wed Oct 28 2026 on a fresh clone (Python 3.13, Node 20). Optional overlay render needs `pip install -e '.[seen]'` and
+Re-run Wed Oct 28 2026 on a fresh clone (Python 3.13, Node 20). Optional overlay render needs `pip install -e '.[seen]'` and
 ffmpeg on PATH. `demo_pipeline/captions/transcribe_stream.py` needs `requests` (`pip install -e '.[captions]'`; also in `[dev]`).
 
 Live Muse Spark explanation (needs a Meta Model API key):
@@ -427,7 +453,7 @@ not in this repo: `qor-receipt` from [ConWan30/qortime@0e87ec3](https://github.c
 - **No device-proof overclaims** (banned list in [`qortime_ai/redteam/wording.py`](qortime_ai/redteam/wording.py));
   device status is at most "TPM claimed (unverified)".
 - **QorTime does not prove who held the controller and does not catch collusion.**
-- **Not a coach.** Anti-cheat and verified skill only; prompts forbid play advice and the guardrail drops it.
+- **Not a coach.** Integrity checks only; prompts forbid play advice and the guardrail drops it.
 - **Limits, stated plainly.** Two referee-verified matches is a small sample (n = 2), not a measured accuracy. Both
   are Madden NFL 27 on PS5, one player's own matches, with only the home or away side recorded (single-sided, no
   two-player corroboration). The referee spot-checks video segments (166/525 and 270/878) rather than re-hashing all
