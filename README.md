@@ -155,8 +155,10 @@ Muse Spark score cross-check:       "Muse Spark agrees with 2 of 2 checked locke
 Show Your Hands:                    "No clip could be aligned to the inputs: nothing scored, no penalty."
 
 Muse Spark explanation (advisory, signed by the AI advisory key, never a referee key):
-STATUS VERIFIED
+VERIFIED
 ...
+The controller-timing advisory was above chance (522‰ vs 447‰). It is advisory only and does not show who played.
+
 Not proven: who was holding the controller, that laptop countersignatures were made live, ...
 ```
 
