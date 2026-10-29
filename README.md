@@ -111,7 +111,8 @@ the result and never decides it.
 What to look for on **220105**, stated as plainly as on the page:
 - **The final came through the referee's end-menu fallback.** The referee found no fourth-quarter scorebug in the last
   part of the video, so it read the end-of-game menu and checked it against the last locked score in the signed
-  timeline. They matched. The fallback is pre-existing referee code, not something added for this match.
+  timeline. They matched. The fallback logic is pre-existing referee code (at `0e87ec3`). The end-menu reader it used
+  includes an in-window fix: qorcap #116, pinned into the referee by qortime #104 on Oct 26 (see [`PROVENANCE.md`](PROVENANCE.md)).
 - **One advisory flag is shown, not hidden:** `alignment_not_above_chance`. QorCap's on-device controller-vs-video
   timing score was 435‰ against 477‰ for chance. It is advisory only. It is not one of the referee's seven checks and
   it does not change the status. Human-likeness was 950‰, which is also advisory.
@@ -237,8 +238,9 @@ highlight-clip `manifest.json`, both published on qortime.com before the event; 
 
 **The two verified matches.** Match 170123 and its page are pre-existing (signed Oct 23 2026). Match 220105 was
 played, uploaded and verified on Oct 27 2026, during the event. The live referee that reviewed it runs qortime code
-from after the pinned commit, including changes made in the qortime repo during the event week: motion rule v4
-(Oct 26) and the referee's automatic advisory hooks for this repo's Muse files. The 220105 match page, its signed Muse
+from after the pinned commit, including changes made during the event week: motion rule v4 (qortime #106, Oct 26), the
+end-menu reader fix (qorcap #116, pinned into the referee by qortime #104, Oct 26) and the referee's automatic advisory
+hooks for this repo's Muse files (qortime #96, #98). The 220105 match page, its signed Muse
 Spark explanation and its Challenge Echo run were also made during the event. The page lives in the qortime repo, not
 here.
 
