@@ -8,7 +8,7 @@ from __future__ import annotations
 import re
 
 BANNED_TERMS = ("attested", "hardware-verified", "certified", "guaranteed", "proven cheat-free", "proof of human play",
-                "settle")
+                "settle", "human proof", "proof of human", "proves a human")
 
 _RULES = [
     (re.compile(r"attest", re.I), "attested"),
@@ -21,6 +21,7 @@ _RULES = [
     # Added Oct 28 2026 (in-window), same as ai_ruling/guardrail.py.
     (re.compile(r"\bproo?f\s+of\s+(a\s+)?human\s+play(?!er)|\bproves?\s+(that\s+)?a\s+human\s+played", re.I), "proof of human play"),
     (re.compile(r"\bsettl(e|es|ed|ing|ement|ements)\b", re.I), "settle"),
+    (re.compile(r"\bhuman[\s-]+proof\b|\bproo?f\s+of\s+human\b|\bproves?\s+(that\s+)?a\s+human\b", re.I), "human proof"),
 ]
 _CITE = re.compile(r"\[[^\[\]]*\]")
 
