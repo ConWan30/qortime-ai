@@ -12,7 +12,7 @@ from fastapi.testclient import TestClient
 from qortime_ai.agent_api import core
 from qortime_ai.agent_api.app import create_app
 from qortime_ai.agent_api.core import AGENT_RULE, BadRequest, Service, UpstreamError, match_id_from_url
-from qortime_ai.ai_ruling.guardrail import BANNED
+from qortime_ai.ai_ruling.guardrail import BANNED, check_text
 from qortime_ai.redteam.wording import banned_hits
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -307,6 +307,20 @@ def test_mcp_tools():
 def test_new_banned_framing(text):
     assert banned_hits(text)
     assert any(rx.search(text) for rx, code in BANNED if code in ("human_play_claim", "settle_language"))
+
+
+@pytest.mark.parametrize("text", ["Controller input advisory did not pass as human proof.", "This is proof of human input.",
+                                  "The timing proves a human was there.", "A human-proof signal."])
+def test_human_proof_framing_banned(text):
+    assert banned_hits(text)
+    assert any(rx.search(text) for rx, code in BANNED if code == "human_proof_claim")
+
+
+def test_controller_timing_rewrite_passes_guardrail():
+    t = ("VERIFIED\n\nThe controller-timing advisory was not above chance (435\u2030 vs 477\u2030). "
+         "It is advisory only and does not show who played.")
+    assert not banned_hits(t)
+    assert check_text(t, "VERIFIED") == []
 
 
 def test_new_banned_framing_allows_existing_honest_wording():

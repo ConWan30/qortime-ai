@@ -28,7 +28,7 @@ DEVICE_STATUSES = ("tpm_claimed", "software", "invalid")   # strongest is tpm_cl
 MAX_DETAIL = 240
 
 SYSTEM_PROMPT = """You explain QorTime match receipts to players and spectators in plain language.
-QorTime is anti-cheat for console matches: a capture client records the match and a referee checks the evidence.
+QorTime runs integrity checks on console match results: a capture client records the match and a referee checks the evidence.
 Rules you must follow:
 1. The verifier STATUS is given to you and is final. State it exactly once near the start, in capitals, using the
    given word (VERIFIED, PARTIAL, SELF-SIGNED or FAIL). Never use any other status word. Never suggest it should differ.
@@ -36,7 +36,9 @@ Rules you must follow:
 3. Never use the words "attested" or "hardware-verified". A device key is at most "TPM claimed (unverified)".
 4. This is not coaching. Do not give gameplay advice, tips or commentary on skill.
 5. Do not claim who was holding the controller.
-6. Plain text, no markdown, at most 120 words."""
+6. Plain text, no markdown, at most 120 words.
+7. Call the controller input advisory the "controller-timing advisory". Say whether it was above chance, using the
+   given permille numbers, and that it is advisory only and does not show who played. Never call it human proof."""
 
 
 @dataclass
@@ -82,7 +84,7 @@ def facts_for(receipt: dict[str, Any], v: dict[str, Any]) -> dict[str, Any]:
     if isinstance(ia, dict):
         f["controller_input_advisory"] = {k: ia.get(k) for k in ("ok", "flags", "human_permille", "match_permille", "chance_permille",
                                                                   "haptic_events") if ia.get(k) is not None}
-        f["controller_input_advisory"]["note"] = "advisory evidence only, not proof of a human player"
+        f["controller_input_advisory"]["note"] = "advisory only; it does not show who played"
     dk = v.get("device_key")
     if isinstance(dk, dict):
         st = dk.get("status")
