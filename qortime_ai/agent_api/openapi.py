@@ -16,8 +16,8 @@ Statuses: VERIFIED, PARTIAL, SELF-SIGNED, FAIL. Only VERIFIED with verified=true
 
 Limits to pass on to the user: """ + " ".join(LIMITS) + """
 
-Do not describe a result as proof of who played or held the controller. Use "records", "announces" or "unlocks on
-VERIFIED" for what an agent may do with a verified result. Not affiliated with Meta, EA, the NFL, Sony or Activision."""
+Do not describe a result as proof of who played or held the controller. Use "records" or "announces" for
+what an agent may do with a verified result. Not affiliated with Meta, EA, the NFL, Sony or Activision."""
 
 _ID = {"name": "match_id", "in": "path", "required": True, "description": "6-digit QorTime match id, e.g. 220105.",
        "schema": {"type": "string", "pattern": "^[0-9]{6}$", "examples": ["220105", "170123"]}}

@@ -11,8 +11,8 @@ deploy: [`deploy/agent-api/Dockerfile`](../deploy/agent-api/Dockerfile).
 > Rule for every agent: **an agent must only announce or record a result as VERIFIED when `verified` is true;
 > otherwise tell the user it is not verified and why.**
 
-A public, read-only API. Personal agents (for example Meta's Muse app through a custom connector), bots and scripts
-can list QorTime's published matches and re-check one. It re-runs the **pre-existing** deterministic verifier
+A public, read-only API. Any agent that supports OpenAPI or MCP connectors can call it, and so can bots and scripts.
+It lists QorTime's published matches and re-checks one. It re-runs the **pre-existing** deterministic verifier
 (`qor_receipt.receipt.verify_receipt`, pinned at `ConWan30/qortime@0e87ec3`) on the published receipt against the
 pinned official referee key, then checks the referee's public transparency log. It runs **no AI model** and decides
 nothing; it reports what the verifier returns.
@@ -60,7 +60,7 @@ What an agent may say, depending on the answer:
 
 | Answer | Say | Don't say |
 |---|---|---|
-| `verified: true` | "Match 220105 is VERIFIED by the QorTime referee's signed receipt: away 7 – home 21." Then the `limits`, e.g. it does not show who held the controller. The agent may record it, announce it, or unlock something on VERIFIED. | That it shows who played, that a human played, or that the AI decided it |
+| `verified: true` | "Match 220105 is VERIFIED by the QorTime referee's signed receipt: away 7 – home 21." Then the `limits`, e.g. it does not show who held the controller. The agent may record or announce it, with the limits. | That it shows who played, that a human played, or that the AI decided it |
 | `verified: false` | "This match is not verified," plus the `reasons` | Anything that treats it as VERIFIED, including PARTIAL or SELF-SIGNED |
 
 ## Sample (`GET /agent/v1/verify?url=https://qortime.com/matches/220105/`, abridged)
