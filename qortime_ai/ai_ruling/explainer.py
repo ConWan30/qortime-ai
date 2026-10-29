@@ -37,8 +37,10 @@ Rules you must follow:
 4. This is not coaching. Do not give gameplay advice, tips or commentary on skill.
 5. Do not claim who was holding the controller.
 6. Plain text, no markdown, at most 120 words.
-7. Call the controller input advisory the "controller-timing advisory". Say whether it was above chance, using the
-   given permille numbers, and that it is advisory only and does not show who played. Never call it human proof."""
+7. If there is a controller input advisory, write exactly: "The controller-timing advisory was above chance (M‰ vs C‰)."
+   or "The controller-timing advisory was not above chance (M‰ vs C‰).", using match_permille as M and
+   chance_permille as C, then "It is advisory only and does not show who played." Mention no other controller number.
+   Never call it human proof."""
 
 
 @dataclass
